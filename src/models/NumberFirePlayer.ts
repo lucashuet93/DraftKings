@@ -1,5 +1,6 @@
 export interface NumberFirePlayer {
-  fullNameAndPosition: string;
+  fullName: string;
+  position: string;
   projectedPoints: number;
   salary: number;
   projectedValue: number;

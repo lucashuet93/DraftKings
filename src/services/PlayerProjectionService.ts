@@ -8,20 +8,132 @@ import {
 } from '../models';
 
 export class PlayerProjectionService {
-  combinePlayerProjections(): ProjectedPlayer[] {
-    let players: ProjectedPlayer[] = [];
-    return players;
+  private parseRotoGrinderPlayerSalary(dollarAmount: string): number {
+    const value: string = dollarAmount.split('$')[1].split('K')[0];
+    return parseFloat(value) * 1000;
   }
 
-  private parseRotoGrinderPlayerSalary(dollarAmount: string): number {
-    let value = dollarAmount.split('$')[1].split('K')[0];
-    return parseFloat(value) * 1000;
+  private parseNumberFirePlayerPosition(fullNameAndPosition: string): string {
+    let segments: string[] = fullNameAndPosition.split(
+      String.fromCharCode(160)
+    );
+    return segments[segments.length - 1];
+  }
+
+  private parseNumberFirePlayerFullName(fullNameAndPosition: string): string {
+    const segments: string[] = fullNameAndPosition.split(
+      String.fromCharCode(160)
+    );
+    return segments[0];
   }
 
   retrieveColumnValue<T>(row: ColumnValue[], columnName: string): T {
     return row.find(
       (column: ColumnValue) => column.metadata.colName === columnName
     )?.value as T;
+  }
+
+  normalizePlayerFullName(fullName: string) {
+    // ensure player name is simply first and last name, no Jrs etc. which differ across providers
+    const segments: string[] = fullName.split(' ');
+    return segments[0].concat(' ').concat(segments[1]);
+  }
+
+  projectPointTotal(
+    rotoGrindersPlayer: RotoGrindersPlayer | undefined,
+    numberFirePlayer: NumberFirePlayer | undefined,
+    dailyFantasyFuelPlayer: DailyFantasyFuelPlayer | undefined
+  ): number {
+    let count: number = 0;
+    let totalProjection: number = 0;
+    if (rotoGrindersPlayer !== undefined) {
+      count++;
+      totalProjection += rotoGrindersPlayer.projectedPoints;
+    }
+    if (numberFirePlayer !== undefined) {
+      count++;
+      totalProjection += numberFirePlayer.projectedPoints;
+    }
+    if (dailyFantasyFuelPlayer !== undefined) {
+      count++;
+      totalProjection += dailyFantasyFuelPlayer.projectedPoints;
+    }
+    return count !== 0 ? totalProjection / count : 0;
+  }
+
+  projectPlayers(
+    draftKingsAvailablePlayers: DraftKingsAvailablePlayer[],
+    rotoGrindersPlayers: RotoGrindersPlayer[],
+    numberFirePlayers: NumberFirePlayer[],
+    dailyFantasyFuelPlayers: DailyFantasyFuelPlayer[]
+  ): ProjectedPlayer[] {
+    const projectedPlayers: ProjectedPlayer[] = draftKingsAvailablePlayers.map(
+      (draftKingsAvailablePlayer: DraftKingsAvailablePlayer) => {
+        const linkedRotoGrindersPlayer:
+          | RotoGrindersPlayer
+          | undefined = rotoGrindersPlayers.find(
+          (player: RotoGrindersPlayer) => {
+            return (
+              player.fullName === draftKingsAvailablePlayer.fullName &&
+              player.position === draftKingsAvailablePlayer.position
+            );
+          }
+        );
+        const linkedNumberFirePlayer:
+          | NumberFirePlayer
+          | undefined = numberFirePlayers.find((player: NumberFirePlayer) => {
+          return (
+            player.fullName === draftKingsAvailablePlayer.fullName &&
+            player.position === draftKingsAvailablePlayer.position
+          );
+        });
+        const linkedDailyFantasyFuelPlayer:
+          | DailyFantasyFuelPlayer
+          | undefined = dailyFantasyFuelPlayers.find(
+          (player: DailyFantasyFuelPlayer) => {
+            return (
+              player.fullName === draftKingsAvailablePlayer.fullName &&
+              player.position === draftKingsAvailablePlayer.position
+            );
+          }
+        );
+        const averageProjectedPoints = this.projectPointTotal(
+          linkedRotoGrindersPlayer,
+          linkedNumberFirePlayer,
+          linkedDailyFantasyFuelPlayer
+        );
+        const projectedPlayer: ProjectedPlayer = {
+          firstName: draftKingsAvailablePlayer.fullName.split(' ')[0],
+          lastName: draftKingsAvailablePlayer.fullName.split(' ')[1],
+          playerId: draftKingsAvailablePlayer.playerId,
+          position: draftKingsAvailablePlayer.position,
+          salary: draftKingsAvailablePlayer.salary,
+          team: draftKingsAvailablePlayer.team,
+          opponent: linkedRotoGrindersPlayer
+            ? linkedRotoGrindersPlayer.opponent
+            : linkedDailyFantasyFuelPlayer
+            ? linkedDailyFantasyFuelPlayer.opponent
+            : '',
+          rotoGrindersProjection:
+            linkedRotoGrindersPlayer !== undefined
+              ? linkedRotoGrindersPlayer.projectedPoints
+              : 0,
+          numberFireProjection:
+            linkedNumberFirePlayer !== undefined
+              ? linkedNumberFirePlayer.projectedPoints
+              : 0,
+          dailyFantasyFuelProjection:
+            linkedDailyFantasyFuelPlayer !== undefined
+              ? linkedDailyFantasyFuelPlayer.projectedPoints
+              : 0,
+          projectedPoints: averageProjectedPoints,
+          projectedValue:
+            (averageProjectedPoints / draftKingsAvailablePlayer.salary) * 1000,
+        };
+        return projectedPlayer;
+      }
+    );
+    return projectedPlayers;
   }
 
   createDraftKingsAvailablePlayers(
@@ -35,7 +147,9 @@ export class PlayerProjectionService {
             row,
             'FullNamePlayerIdCombination'
           ),
-          fullName: this.retrieveColumnValue<string>(row, 'FullName'),
+          fullName: this.normalizePlayerFullName(
+            this.retrieveColumnValue<string>(row, 'FullName')
+          ),
           playerId: this.retrieveColumnValue<string>(row, 'PlayerId'),
           rosterPosition: this.retrieveColumnValue<string>(
             row,
@@ -56,7 +170,9 @@ export class PlayerProjectionService {
     const rotoGrindersPlayers: RotoGrindersPlayer[] = tableData.map(
       (row: ColumnValue[]) => {
         const rotoGrindersPlayer: RotoGrindersPlayer = {
-          fullName: this.retrieveColumnValue<string>(row, 'FullName'),
+          fullName: this.normalizePlayerFullName(
+            this.retrieveColumnValue<string>(row, 'FullName')
+          ),
           salary: this.parseRotoGrinderPlayerSalary(
             this.retrieveColumnValue<string>(row, 'Salary')
           ),
@@ -84,8 +200,11 @@ export class PlayerProjectionService {
     const dailyFantasyFuelPlayers: DailyFantasyFuelPlayer[] = tableData.map(
       (row: ColumnValue[]) => {
         const dailyFantasyFuelPlayer: DailyFantasyFuelPlayer = {
-          firstName: this.retrieveColumnValue<string>(row, 'FirstName'),
-          lastName: this.retrieveColumnValue<string>(row, 'LastName'),
+          fullName: this.normalizePlayerFullName(
+            this.retrieveColumnValue<string>(row, 'FirstName')
+              .concat(' ')
+              .concat(this.retrieveColumnValue<string>(row, 'LastName'))
+          ),
           position: this.retrieveColumnValue<string>(row, 'Position'),
           injuryStatus: this.retrieveColumnValue<string>(row, 'InjuryStatus'),
           gameDate: this.retrieveColumnValue<string>(row, 'GameDate'),
@@ -134,9 +253,13 @@ export class PlayerProjectionService {
       })
       .map((row: ColumnValue[]) => {
         const numberFirePlayer: NumberFirePlayer = {
-          fullNameAndPosition: this.retrieveColumnValue<string>(
-            row,
-            'FullNameAndPosition'
+          fullName: this.normalizePlayerFullName(
+            this.parseNumberFirePlayerFullName(
+              this.retrieveColumnValue<string>(row, 'FullNameAndPosition')
+            )
+          ),
+          position: this.parseNumberFirePlayerPosition(
+            this.retrieveColumnValue<string>(row, 'FullNameAndPosition')
           ),
           projectedPoints: this.retrieveColumnValue<number>(
             row,

@@ -7,6 +7,7 @@ import {
   DailyFantasyFuelPlayer,
   NumberFirePlayer,
   DraftKingsAvailablePlayer,
+  ProjectedPlayer,
 } from '../models';
 
 // load environment variables
@@ -19,27 +20,34 @@ const projectPlayers = async () => {
   let rawDraftKingsAvailablesData: ColumnValue[][] = await sqlServerService.loadRawPlayerData(
     'DraftKingsAvailables'
   );
+  let rawRotoGrindersData: ColumnValue[][] = await sqlServerService.loadRawPlayerData(
+    'RotoGrinders'
+  );
   let rawNumberFireData: ColumnValue[][] = await sqlServerService.loadRawPlayerData(
     'NumberFire'
   );
   let rawDailyFantasyFuelData: ColumnValue[][] = await sqlServerService.loadRawPlayerData(
     'DailyFantasyFuel'
   );
-  let rawRotoGrindersData: ColumnValue[][] = await sqlServerService.loadRawPlayerData(
-    'RotoGrinders'
+  const draftKingsAvailablePlayers: DraftKingsAvailablePlayer[] = playerProjectionService.createDraftKingsAvailablePlayers(
+    rawDraftKingsAvailablesData
   );
   const rotoGrindersPlayers: RotoGrindersPlayer[] = playerProjectionService.createRotoGrindersPlayers(
     rawRotoGrindersData
   );
-  const dailyFantasyFuelPlayers: DailyFantasyFuelPlayer[] = playerProjectionService.createDailyFantasyFuelPlayers(
-    rawDailyFantasyFuelData
-  );
   const numberFirePlayers: NumberFirePlayer[] = playerProjectionService.createNumberFirePlayers(
     rawNumberFireData
   );
-  const draftKingsAvailablePlayers: DraftKingsAvailablePlayer[] = playerProjectionService.createDraftKingsAvailablePlayers(
-    rawDraftKingsAvailablesData
+  const dailyFantasyFuelPlayers: DailyFantasyFuelPlayer[] = playerProjectionService.createDailyFantasyFuelPlayers(
+    rawDailyFantasyFuelData
   );
+  const playerProjections: ProjectedPlayer[] = playerProjectionService.projectPlayers(
+    draftKingsAvailablePlayers,
+    rotoGrindersPlayers,
+    numberFirePlayers,
+    dailyFantasyFuelPlayers
+  );
+  await sqlServerService.savePlayerProjections(playerProjections);
 };
 
 projectPlayers();

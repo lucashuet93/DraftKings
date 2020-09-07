@@ -1,6 +1,5 @@
 export interface DailyFantasyFuelPlayer {
-  firstName: string;
-  lastName: string;
+  fullName: string;
   position: string;
   injuryStatus: string;
   gameDate: string;

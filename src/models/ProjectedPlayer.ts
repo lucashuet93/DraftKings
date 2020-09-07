@@ -6,9 +6,9 @@ export interface ProjectedPlayer {
   salary: number;
   team: string;
   opponent: string;
+  rotoGrindersProjection: number;
   numberFireProjection: number;
   dailyFantasyFuelProjection: number;
-  rotoGrindersProjection: number;
   projectedPoints: number;
   projectedValue: number;
 }

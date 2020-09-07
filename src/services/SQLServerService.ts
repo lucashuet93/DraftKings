@@ -1,4 +1,5 @@
 import { Connection, ConnectionConfig, Request, ColumnValue } from 'tedious';
+import { ProjectedPlayer } from '../models';
 
 export class SQLServerService {
   createConnection(): Connection {
@@ -18,7 +19,7 @@ export class SQLServerService {
     return new Connection(config);
   }
 
-  buildRequestForTable(
+  buildLoadRequestForTable(
     tableName: string,
     onError: (err: Error) => void
   ): Request {
@@ -36,7 +37,7 @@ export class SQLServerService {
         if (err) {
           reject(err);
         } else {
-          const request: Request = this.buildRequestForTable(
+          const request: Request = this.buildLoadRequestForTable(
             tableName,
             (err: Error) => {
               reject(err);
@@ -52,6 +53,43 @@ export class SQLServerService {
             resolve(results);
           });
 
+          connection.execSql(request);
+        }
+      });
+    });
+  }
+
+  async savePlayerProjections(
+    playerProjections: ProjectedPlayer[]
+  ): Promise<void> {
+    const connection: Connection = this.createConnection();
+    return new Promise<void>((resolve: Function, reject: Function) => {
+      connection.on('connect', (err: Error) => {
+        if (err) {
+          reject(err);
+        } else {
+          const recordValues: string[] = playerProjections.map(
+            (player: ProjectedPlayer) => {
+              const preparedFirstName: string = player.firstName.replace(
+                `'`,
+                `''`
+              );
+              const preparedLastName: string = player.lastName.replace(
+                `'`,
+                `''`
+              );
+              return `('${preparedFirstName}','${preparedLastName}','${player.playerId}','${player.position}',${player.salary},'${player.team}','${player.opponent}',${player.rotoGrindersProjection},${player.numberFireProjection},${player.dailyFantasyFuelProjection},${player.projectedPoints},${player.projectedValue})`;
+            }
+          );
+          const valueString: string = recordValues.join(',');
+          const request: Request = new Request(
+            `INSERT into [dbo].[PlayerProjections] (FirstName, LastName, PlayerId, Position, Salary, Team, Opponent, RotoGrindersProjection, NumberFireProjection, DailyFantasyFuelProjection, ProjectedPoints, ProjectedValue) VALUES ${valueString};`,
+            (err: Error) => {
+              if (err) {
+                reject(err);
+              }
+            }
+          );
           connection.execSql(request);
         }
       });
