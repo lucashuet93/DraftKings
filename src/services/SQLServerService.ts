@@ -78,12 +78,12 @@ export class SQLServerService {
                 `'`,
                 `''`
               );
-              return `('${preparedFirstName}','${preparedLastName}','${player.playerId}','${player.position}',${player.salary},'${player.team}','${player.opponent}',${player.rotoGrindersProjection},${player.numberFireProjection},${player.dailyFantasyFuelProjection},${player.projectedPoints},${player.projectedValue})`;
+              return `('${preparedFirstName}','${preparedLastName}','${player.playerId}','${player.position}',${player.salary},'${player.team}','${player.opponent}',${player.rotoGrindersProjection},${player.numberFireProjection},${player.dailyFantasyFuelProjection},${player.projectedPoints},${player.projectedValue},${player.averagePPG})`;
             }
           );
           const valueString: string = recordValues.join(',');
           const request: Request = new Request(
-            `DELETE FROM [dbo].[PlayerProjections]; INSERT INTO [dbo].[PlayerProjections] (FirstName, LastName, PlayerId, Position, Salary, Team, Opponent, RotoGrindersProjection, NumberFireProjection, DailyFantasyFuelProjection, ProjectedPoints, ProjectedValue) VALUES ${valueString};`,
+            `DELETE FROM [dbo].[PlayerProjections]; INSERT INTO [dbo].[PlayerProjections] (FirstName, LastName, PlayerId, Position, Salary, Team, Opponent, RotoGrindersProjection, NumberFireProjection, DailyFantasyFuelProjection, ProjectedPoints, ProjectedValue, AveragePPG) VALUES ${valueString};`,
             (err: Error) => {
               if (err) {
                 reject(err);

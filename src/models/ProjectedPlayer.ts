@@ -11,4 +11,5 @@ export interface ProjectedPlayer {
   dailyFantasyFuelProjection: number;
   projectedPoints: number;
   projectedValue: number;
+  averagePPG: number;
 }

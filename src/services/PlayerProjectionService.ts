@@ -95,8 +95,12 @@ export class PlayerProjectionService {
               ? linkedDailyFantasyFuelPlayer.projectedPoints
               : 0,
           projectedPoints: averageProjectedPoints,
-          projectedValue:
-            (averageProjectedPoints / draftKingsAvailablePlayer.salary) * 1000,
+          // use unary operator to accurately round to 2 decimal places
+          projectedValue: +(
+            (averageProjectedPoints / draftKingsAvailablePlayer.salary) *
+            1000
+          ).toFixed(2),
+          averagePPG: draftKingsAvailablePlayer.averagePPG,
         };
         return projectedPlayer;
       }
