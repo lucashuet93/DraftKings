@@ -1,7 +1,10 @@
 import { config } from 'dotenv';
-import { SQLServerService } from '../services';
 import { ColumnValue } from 'tedious';
-import { PlayerProjectionService } from '../services/PlayerProjectionService';
+import {
+  PlayerParser,
+  PlayerProjectionService,
+  SQLServerService,
+} from '../services';
 import {
   RotoGrindersPlayer,
   DailyFantasyFuelPlayer,
@@ -9,7 +12,6 @@ import {
   DraftKingsAvailablePlayer,
   ProjectedPlayer,
 } from '../models';
-import { PlayerParser } from '../services/PlayerParser';
 
 // load environment variables
 config();
