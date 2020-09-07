@@ -20,10 +20,7 @@ export class PlayerParser {
 
   parseNumberFirePlayerFullName(fullNameAndPosition: string): string {
     if (fullNameAndPosition.includes('D/ST')) {
-      const defenseName: string = this.prepareNumberFireDefenseName(
-        fullNameAndPosition
-      );
-      return defenseName;
+      return fullNameAndPosition;
     } else {
       const segments: string[] = fullNameAndPosition.split(
         String.fromCharCode(160)
@@ -32,80 +29,105 @@ export class PlayerParser {
     }
   }
 
-  prepareRotoGrindersDefenseName(fullName: string): string {
+  prepareDefenseName(fullName: string): string {
     // return team name for consistency with name on Draft Kings (e.g. Panthers)
-    const segments: string[] = fullName.split(' ');
-    return segments[segments.length - 1];
-  }
-
-  prepareNumberFireDefenseName(fullName: string): string {
-    // return team name for consistency with name on Draft Kings (e.g. Panthers)
-    switch (fullName) {
-      case 'Carolina D/ST':
-        return 'Panthers';
-      case 'Tampa Bay D/ST':
-        return 'Buccaneers';
-      case 'Atlanta D/ST':
-        return 'Falcons';
-      case 'New Orleans D/ST':
-        return 'Saints';
-      case 'Minnesota D/ST':
-        return 'Vikings';
-      case 'Detroit D/ST':
-        return 'Lions';
-      case 'Green Bay D/ST':
-        return 'Packers';
-      case 'Chicago D/ST':
-        return 'Bears';
-      case 'Arizona D/ST':
-        return 'Cardinals';
-      case 'San Francisco D/ST':
-        return '49ers';
-      case 'Los Angeles Rams D/ST':
-        return 'Rams';
-      case 'Seattle D/ST':
-        return 'Seahawks';
-      case 'Philadelphia D/ST':
-        return 'Eagles';
-      case 'Dallas D/ST':
-        return 'Cowboys';
-      case 'New York Giants D/ST':
-        return 'Giants';
-      // missing Washington
-      case 'Miami D/ST':
-        return 'Dolphins';
-      case 'New England D/ST':
-        return 'Patriots';
-      case 'New York Jets D/ST':
-        return 'Jets';
-      case 'Buffalo D/ST':
-        return 'Bills';
-      case 'Pittsburgh D/ST':
-        return 'Steelers';
-      case 'Cleveland D/ST':
-        return 'Browns';
-      case 'Baltimore D/ST':
-        return 'Ravens';
-      case 'Cincinnati D/ST':
-        return 'Bengals';
-      case 'Los Angeles Chargers D/ST':
-        return 'Chargers';
-      case 'Denver D/ST':
-        return 'Broncos';
-      case 'Kansas City D/ST':
-        return 'Chiefs';
-      // missing Las Vegas
-      case 'Tennessee D/ST':
-        return 'Titans';
-      case 'Indianapolis D/ST':
-        return 'Colts';
-      case 'Houston D/ST':
-        return 'Texans';
-      case 'Jacksonville D/ST':
-        return 'Jaguars';
-      default:
-        return '';
+    let defenseName: string = '';
+    if (fullName.includes('Carolina') || fullName.includes('Panthers')) {
+      defenseName = 'Panthers';
+    } else if (
+      fullName.includes('New Orleans') ||
+      fullName.includes('Saints')
+    ) {
+      defenseName = 'Saints';
+    } else if (
+      fullName.includes('Tampa Bay') ||
+      fullName.includes('Buccaneers')
+    ) {
+      defenseName = 'Buccaneers';
+    } else if (fullName.includes('Atlanta') || fullName.includes('Falcons')) {
+      defenseName = 'Falcons';
+    } else if (fullName.includes('Green Bay') || fullName.includes('Packers')) {
+      defenseName = 'Packers';
+    } else if (fullName.includes('Minnesota') || fullName.includes('Vikings')) {
+      defenseName = 'Vikings';
+    } else if (fullName.includes('Detroit') || fullName.includes('Lions')) {
+      defenseName = 'Lions';
+    } else if (fullName.includes('Chicago') || fullName.includes('Bears')) {
+      defenseName = 'Bears';
+    } else if (
+      fullName.includes('San Francisco') ||
+      fullName.includes('49ers')
+    ) {
+      defenseName = '49ers';
+    } else if (fullName.includes('Seattle') || fullName.includes('Seahawks')) {
+      defenseName = 'Seahawks';
+    } else if (fullName.includes('Arizona') || fullName.includes('Cardinals')) {
+      defenseName = 'Cardinals';
+    } else if (fullName.includes('Rams')) {
+      defenseName = 'Rams';
+    } else if (fullName.includes('Dallas') || fullName.includes('Cowboys')) {
+      defenseName = 'Cowboys';
+    } else if (
+      fullName.includes('Philadelphia') ||
+      fullName.includes('Eagles')
+    ) {
+      defenseName = 'Eagles';
+    } else if (fullName.includes('Giants')) {
+      defenseName = 'Giants';
+    } else if (fullName.includes('Washington') || fullName.includes('WAS')) {
+      defenseName = 'WAS';
+    } else if (
+      fullName.includes('New England') ||
+      fullName.includes('Patriots')
+    ) {
+      defenseName = 'Patriots';
+    } else if (fullName.includes('Jets')) {
+      defenseName = 'Jets';
+    } else if (fullName.includes('Buffalo') || fullName.includes('Bills')) {
+      defenseName = 'Bills';
+    } else if (fullName.includes('Miami') || fullName.includes('Dolphins')) {
+      defenseName = 'Dolphins';
+    } else if (
+      fullName.includes('Indianapolis') ||
+      fullName.includes('Colts')
+    ) {
+      defenseName = 'Colts';
+    } else if (fullName.includes('Houston') || fullName.includes('Texans')) {
+      defenseName = 'Texans';
+    } else if (
+      fullName.includes('Jacksonville') ||
+      fullName.includes('Jaguars')
+    ) {
+      defenseName = 'Jaguars';
+    } else if (fullName.includes('Tennessee') || fullName.includes('Titans')) {
+      defenseName = 'Titans';
+    } else if (fullName.includes('Denver') || fullName.includes('Broncos')) {
+      defenseName = 'Broncos';
+    } else if (
+      fullName.includes('Kansas City') ||
+      fullName.includes('Chiefs')
+    ) {
+      defenseName = 'Chiefs';
+    } else if (fullName.includes('Las Vegas') || fullName.includes('Raiders')) {
+      defenseName = 'Raiders';
+    } else if (fullName.includes('Chargers')) {
+      defenseName = 'Chargers';
+    } else if (
+      fullName.includes('Pittsburgh') ||
+      fullName.includes('Steelers')
+    ) {
+      defenseName = 'Steelers';
+    } else if (fullName.includes('Cleveland') || fullName.includes('Browns')) {
+      defenseName = 'Browns';
+    } else if (fullName.includes('Baltimore') || fullName.includes('Ravens')) {
+      defenseName = 'Ravens';
+    } else if (
+      fullName.includes('Cincinnati') ||
+      fullName.includes('Bengals')
+    ) {
+      defenseName = 'Bengals';
     }
+    return defenseName;
   }
 
   parseRotoGrinderPlayerSalary(dollarAmount: string): number {
@@ -119,16 +141,20 @@ export class PlayerParser {
     )?.value as T;
   }
 
-  normalizePlayerFullName(fullName: string): string {
+  normalizePlayerFullName(fullName: string, position: string): string {
     // ensure player name is simply first and last name, no Jrs, IIIs, etc. which differ across providers
-    const segments: string[] = fullName.split(' ');
-    const fullNameWithoutSuffix: string = segments[0]
-      .concat(' ')
-      .concat(segments[1]);
-    // ensure DJs and DKs are normalized
-    const djNormalized: string = fullNameWithoutSuffix.replace('D.J.', 'DJ');
-    const normalized: string = djNormalized.replace('D.K.', 'DK');
-    return normalized;
+    if (position === 'DST') {
+      return this.prepareDefenseName(fullName);
+    } else {
+      const segments: string[] = fullName.split(' ');
+      const fullNameWithoutSuffix: string = segments[0]
+        .concat(' ')
+        .concat(segments[1]);
+      // ensure DJs and DKs are normalized
+      const djNormalized: string = fullNameWithoutSuffix.replace('D.J.', 'DJ');
+      const normalized: string = djNormalized.replace('D.K.', 'DK');
+      return normalized;
+    }
   }
 
   parseDraftKingsAvailablePlayers(
@@ -136,14 +162,19 @@ export class PlayerParser {
   ): DraftKingsAvailablePlayer[] {
     const draftKingsAvailablePlayers: DraftKingsAvailablePlayer[] = tableData.map(
       (row: ColumnValue[]) => {
+        const position: string = this.retrieveColumnValue<string>(
+          row,
+          'Position'
+        );
         const draftKingsAvailablePlayer: DraftKingsAvailablePlayer = {
-          position: this.retrieveColumnValue<string>(row, 'Position'),
+          position: position,
           fullNamePlayerIdCombination: this.retrieveColumnValue<string>(
             row,
             'FullNamePlayerIdCombination'
           ),
           fullName: this.normalizePlayerFullName(
-            this.retrieveColumnValue<string>(row, 'FullName')
+            this.retrieveColumnValue<string>(row, 'FullName'),
+            position
           ),
           playerId: this.retrieveColumnValue<string>(row, 'PlayerId'),
           rosterPosition: this.retrieveColumnValue<string>(
@@ -164,15 +195,20 @@ export class PlayerParser {
   parseRotoGrindersPlayers(tableData: ColumnValue[][]): RotoGrindersPlayer[] {
     const rotoGrindersPlayers: RotoGrindersPlayer[] = tableData.map(
       (row: ColumnValue[]) => {
+        const position: string = this.retrieveColumnValue<string>(
+          row,
+          'Position'
+        );
         const rotoGrindersPlayer: RotoGrindersPlayer = {
           fullName: this.normalizePlayerFullName(
-            this.retrieveColumnValue<string>(row, 'FullName')
+            this.retrieveColumnValue<string>(row, 'FullName'),
+            position
           ),
           salary: this.parseRotoGrinderPlayerSalary(
             this.retrieveColumnValue<string>(row, 'Salary')
           ),
           team: this.retrieveColumnValue<string>(row, 'Team'),
-          position: this.retrieveColumnValue<string>(row, 'Position'),
+          position: position,
           opponent: this.retrieveColumnValue<string>(row, 'Opponent'),
           projectedPoints: this.retrieveColumnValue<number>(
             row,
@@ -194,13 +230,18 @@ export class PlayerParser {
   ): DailyFantasyFuelPlayer[] {
     const dailyFantasyFuelPlayers: DailyFantasyFuelPlayer[] = tableData.map(
       (row: ColumnValue[]) => {
+        const position: string = this.retrieveColumnValue<string>(
+          row,
+          'Position'
+        );
         const dailyFantasyFuelPlayer: DailyFantasyFuelPlayer = {
           fullName: this.normalizePlayerFullName(
             this.retrieveColumnValue<string>(row, 'FirstName')
               .concat(' ')
-              .concat(this.retrieveColumnValue<string>(row, 'LastName'))
+              .concat(this.retrieveColumnValue<string>(row, 'LastName')),
+            position
           ),
-          position: this.retrieveColumnValue<string>(row, 'Position'),
+          position: position,
           injuryStatus: this.retrieveColumnValue<string>(row, 'InjuryStatus'),
           gameDate: this.retrieveColumnValue<string>(row, 'GameDate'),
           slate: this.retrieveColumnValue<string>(row, 'Slate'),
@@ -247,15 +288,17 @@ export class PlayerParser {
         return this.retrieveColumnValue<number>(row, 'ProjectedValue') !== null;
       })
       .map((row: ColumnValue[]) => {
+        const position: string = this.parseNumberFirePlayerPosition(
+          this.retrieveColumnValue<string>(row, 'FullNameAndPosition')
+        );
         const numberFirePlayer: NumberFirePlayer = {
           fullName: this.normalizePlayerFullName(
             this.parseNumberFirePlayerFullName(
               this.retrieveColumnValue<string>(row, 'FullNameAndPosition')
-            )
+            ),
+            position
           ),
-          position: this.parseNumberFirePlayerPosition(
-            this.retrieveColumnValue<string>(row, 'FullNameAndPosition')
-          ),
+          position: position,
           projectedPoints: this.retrieveColumnValue<number>(
             row,
             'ProjectedPoints'

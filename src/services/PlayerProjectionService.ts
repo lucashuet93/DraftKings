@@ -70,9 +70,13 @@ export class PlayerProjectionService {
           linkedNumberFirePlayer,
           linkedDailyFantasyFuelPlayer
         );
+        const lastName:
+          | string
+          | undefined = draftKingsAvailablePlayer.fullName.split(' ')[1];
         const projectedPlayer: ProjectedPlayer = {
           firstName: draftKingsAvailablePlayer.fullName.split(' ')[0],
-          lastName: draftKingsAvailablePlayer.fullName.split(' ')[1],
+          // handle undefined last names (defenses)
+          lastName: lastName ? lastName : '',
           playerId: draftKingsAvailablePlayer.playerId,
           position: draftKingsAvailablePlayer.position,
           salary: draftKingsAvailablePlayer.salary,
