@@ -7,23 +7,110 @@ import {
 } from '../models';
 
 export class PlayerParser {
-  parseRotoGrinderPlayerSalary(dollarAmount: string): number {
-    const value: string = dollarAmount.split('$')[1].split('K')[0];
-    return parseFloat(value) * 1000;
-  }
-
   parseNumberFirePlayerPosition(fullNameAndPosition: string): string {
-    let segments: string[] = fullNameAndPosition.split(
-      String.fromCharCode(160)
-    );
-    return segments[segments.length - 1];
+    if (fullNameAndPosition.includes('D/ST')) {
+      return 'DST';
+    } else {
+      const segments: string[] = fullNameAndPosition.split(
+        String.fromCharCode(160)
+      );
+      return segments[segments.length - 1];
+    }
   }
 
   parseNumberFirePlayerFullName(fullNameAndPosition: string): string {
-    const segments: string[] = fullNameAndPosition.split(
-      String.fromCharCode(160)
-    );
-    return segments[0];
+    if (fullNameAndPosition.includes('D/ST')) {
+      const defenseName: string = this.prepareNumberFireDefenseName(
+        fullNameAndPosition
+      );
+      return defenseName;
+    } else {
+      const segments: string[] = fullNameAndPosition.split(
+        String.fromCharCode(160)
+      );
+      return segments[0];
+    }
+  }
+
+  prepareRotoGrindersDefenseName(fullName: string): string {
+    // return team name for consistency with name on Draft Kings (e.g. Panthers)
+    const segments: string[] = fullName.split(' ');
+    return segments[segments.length - 1];
+  }
+
+  prepareNumberFireDefenseName(fullName: string): string {
+    // return team name for consistency with name on Draft Kings (e.g. Panthers)
+    switch (fullName) {
+      case 'Carolina D/ST':
+        return 'Panthers';
+      case 'Tampa Bay D/ST':
+        return 'Buccaneers';
+      case 'Atlanta D/ST':
+        return 'Falcons';
+      case 'New Orleans D/ST':
+        return 'Saints';
+      case 'Minnesota D/ST':
+        return 'Vikings';
+      case 'Detroit D/ST':
+        return 'Lions';
+      case 'Green Bay D/ST':
+        return 'Packers';
+      case 'Chicago D/ST':
+        return 'Bears';
+      case 'Arizona D/ST':
+        return 'Cardinals';
+      case 'San Francisco D/ST':
+        return '49ers';
+      case 'Los Angeles Rams D/ST':
+        return 'Rams';
+      case 'Seattle D/ST':
+        return 'Seahawks';
+      case 'Philadelphia D/ST':
+        return 'Eagles';
+      case 'Dallas D/ST':
+        return 'Cowboys';
+      case 'New York Giants D/ST':
+        return 'Giants';
+      // missing Washington
+      case 'Miami D/ST':
+        return 'Dolphins';
+      case 'New England D/ST':
+        return 'Patriots';
+      case 'New York Jets D/ST':
+        return 'Jets';
+      case 'Buffalo D/ST':
+        return 'Bills';
+      case 'Pittsburgh D/ST':
+        return 'Steelers';
+      case 'Cleveland D/ST':
+        return 'Browns';
+      case 'Baltimore D/ST':
+        return 'Ravens';
+      case 'Cincinnati D/ST':
+        return 'Bengals';
+      case 'Los Angeles Chargers D/ST':
+        return 'Chargers';
+      case 'Denver D/ST':
+        return 'Broncos';
+      case 'Kansas City D/ST':
+        return 'Chiefs';
+      // missing Las Vegas
+      case 'Tennessee D/ST':
+        return 'Titans';
+      case 'Indianapolis D/ST':
+        return 'Colts';
+      case 'Houston D/ST':
+        return 'Texans';
+      case 'Jacksonville D/ST':
+        return 'Jaguars';
+      default:
+        return '';
+    }
+  }
+
+  parseRotoGrinderPlayerSalary(dollarAmount: string): number {
+    const value: string = dollarAmount.split('$')[1].split('K')[0];
+    return parseFloat(value) * 1000;
   }
 
   retrieveColumnValue<T>(row: ColumnValue[], columnName: string): T {
@@ -32,10 +119,16 @@ export class PlayerParser {
     )?.value as T;
   }
 
-  normalizePlayerFullName(fullName: string) {
-    // ensure player name is simply first and last name, no Jrs etc. which differ across providers
+  normalizePlayerFullName(fullName: string): string {
+    // ensure player name is simply first and last name, no Jrs, IIIs, etc. which differ across providers
     const segments: string[] = fullName.split(' ');
-    return segments[0].concat(' ').concat(segments[1]);
+    const fullNameWithoutSuffix: string = segments[0]
+      .concat(' ')
+      .concat(segments[1]);
+    // ensure DJs and DKs are normalized
+    const djNormalized: string = fullNameWithoutSuffix.replace('D.J.', 'DJ');
+    const normalized: string = djNormalized.replace('D.K.', 'DK');
+    return normalized;
   }
 
   parseDraftKingsAvailablePlayers(
