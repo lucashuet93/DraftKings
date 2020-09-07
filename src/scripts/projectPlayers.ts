@@ -53,7 +53,7 @@ const projectPlayers = async () => {
     numberFirePlayers,
     dailyFantasyFuelPlayers
   );
-  await sqlServerService.savePlayerProjections(playerProjections, 3);
+  await sqlServerService.savePlayerProjections(playerProjections, 1, 1);
 };
 
 projectPlayers();

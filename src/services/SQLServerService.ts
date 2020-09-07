@@ -61,7 +61,8 @@ export class SQLServerService {
 
   async savePlayerProjections(
     playerProjections: ProjectedPlayer[],
-    minProjection: number
+    minProjectedPoints: number,
+    minProjectionServices: number
   ): Promise<void> {
     const connection: Connection = this.createConnection();
     return new Promise<void>((resolve: Function, reject: Function) => {
@@ -71,8 +72,16 @@ export class SQLServerService {
         } else {
           const recordValues: string[] = playerProjections
             .filter((player: ProjectedPlayer) => {
-              // filter out players without projections from any service
-              return player.projectedPoints >= minProjection;
+              // filter out players without projections from a certain number of services, or below a given projection threshold
+              let totaProjectionServices: number = 0;
+              if (player.rotoGrindersProjection > 0) totaProjectionServices++;
+              if (player.numberFireProjection > 0) totaProjectionServices++;
+              if (player.dailyFantasyFuelProjection > 0)
+                totaProjectionServices++;
+              return (
+                player.projectedPoints >= minProjectedPoints &&
+                totaProjectionServices >= minProjectionServices
+              );
             })
             .map((player: ProjectedPlayer) => {
               const preparedFirstName: string = player.firstName.replace(
