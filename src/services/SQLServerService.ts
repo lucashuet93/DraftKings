@@ -60,7 +60,8 @@ export class SQLServerService {
   }
 
   async savePlayerProjections(
-    playerProjections: ProjectedPlayer[]
+    playerProjections: ProjectedPlayer[],
+    minProjection: number
   ): Promise<void> {
     const connection: Connection = this.createConnection();
     return new Promise<void>((resolve: Function, reject: Function) => {
@@ -68,8 +69,12 @@ export class SQLServerService {
         if (err) {
           reject(err);
         } else {
-          const recordValues: string[] = playerProjections.map(
-            (player: ProjectedPlayer) => {
+          const recordValues: string[] = playerProjections
+            .filter((player: ProjectedPlayer) => {
+              // filter out players without projections from any service
+              return player.projectedPoints >= minProjection;
+            })
+            .map((player: ProjectedPlayer) => {
               const preparedFirstName: string = player.firstName.replace(
                 `'`,
                 `''`
@@ -79,8 +84,7 @@ export class SQLServerService {
                 `''`
               );
               return `('${preparedFirstName}','${preparedLastName}','${player.playerId}','${player.position}',${player.salary},'${player.team}','${player.opponent}',${player.rotoGrindersProjection},${player.numberFireProjection},${player.dailyFantasyFuelProjection},${player.projectedPoints},${player.projectedValue},${player.averagePPG})`;
-            }
-          );
+            });
           const valueString: string = recordValues.join(',');
           const request: Request = new Request(
             `DELETE FROM [dbo].[PlayerProjections]; INSERT INTO [dbo].[PlayerProjections] (FirstName, LastName, PlayerId, Position, Salary, Team, Opponent, RotoGrindersProjection, NumberFireProjection, DailyFantasyFuelProjection, ProjectedPoints, ProjectedValue, AveragePPG) VALUES ${valueString};`,
