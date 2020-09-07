@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "project": "node ./build/scripts/projectPlayers.js"
+    "project": "node ./build/scripts/projectPlayers.js",
+    "optimize": "node ./build/scripts/optimizeLineups.js"
   },
   "keywords": [],
   "author": "",

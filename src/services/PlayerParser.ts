@@ -4,6 +4,7 @@ import {
   RotoGrindersPlayer,
   NumberFirePlayer,
   DraftKingsAvailablePlayer,
+  ProjectedPlayer,
 } from '../models';
 
 export class PlayerParser {
@@ -155,6 +156,45 @@ export class PlayerParser {
       const normalized: string = djNormalized.replace('D.K.', 'DK');
       return normalized;
     }
+  }
+
+  parseProjectedPlayers(tableData: ColumnValue[][]): ProjectedPlayer[] {
+    const projectedPlayers: ProjectedPlayer[] = tableData.map(
+      (row: ColumnValue[]) => {
+        const projectedPlayer: ProjectedPlayer = {
+          firstName: this.retrieveColumnValue<string>(row, 'FirstName'),
+          lastName: this.retrieveColumnValue<string>(row, 'LastName'),
+          playerId: this.retrieveColumnValue<string>(row, 'PlayerId'),
+          position: this.retrieveColumnValue<string>(row, 'Position'),
+          salary: this.retrieveColumnValue<number>(row, 'Salary'),
+          team: this.retrieveColumnValue<string>(row, 'Team'),
+          opponent: this.retrieveColumnValue<string>(row, 'Opponent'),
+          rotoGrindersProjection: this.retrieveColumnValue<number>(
+            row,
+            'RotoGrindersProjection'
+          ),
+          numberFireProjection: this.retrieveColumnValue<number>(
+            row,
+            'NumberFireProjection'
+          ),
+          dailyFantasyFuelProjection: this.retrieveColumnValue<number>(
+            row,
+            'DailyFantasyFuelProjection'
+          ),
+          projectedPoints: this.retrieveColumnValue<number>(
+            row,
+            'ProjectedPoints'
+          ),
+          projectedValue: this.retrieveColumnValue<number>(
+            row,
+            'ProjectedValue'
+          ),
+          averagePPG: this.retrieveColumnValue<number>(row, 'AveragePPG'),
+        };
+        return projectedPlayer;
+      }
+    );
+    return projectedPlayers;
   }
 
   parseDraftKingsAvailablePlayers(
