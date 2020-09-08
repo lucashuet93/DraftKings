@@ -30,9 +30,9 @@ export class LineupOptimizer {
 
   logPlayer(player: ProjectedPlayer, index: string = ''): void {
     console.log(
-      `Processing ${player.position}${index} ${player.firstName.concat(
-        player.lastName
-      )}`
+      `Processing ${player.position}${index} ${player.firstName
+        .concat(' ')
+        .concat(player.lastName)}`
     );
   }
 
@@ -112,196 +112,39 @@ export class LineupOptimizer {
       this.logPlayer(quarterback);
       let lineupSalaryTotal: number = this.calculateSalaryTotal([quarterback]);
       if (lineupSalaryTotal <= maxSalariesAtPosition.QB) {
-        runningbacks.forEach((runningback1: ProjectedPlayer) => {
-          this.logPlayer(runningback1), '1';
-          lineupSalaryTotal = this.calculateSalaryTotal([
-            quarterback,
-            runningback1,
-          ]);
-          if (lineupSalaryTotal <= maxSalariesAtPosition.RB1) {
-            runningbacks.forEach((runningback2: ProjectedPlayer) => {
-              this.logPlayer(runningback2, '2');
-              lineupSalaryTotal = this.calculateSalaryTotal([
-                quarterback,
-                runningback1,
-                runningback2,
-              ]);
-              if (
-                lineupSalaryTotal <= maxSalariesAtPosition.RB2 &&
-                !this.hasDuplicatePlayerIds([runningback1, runningback2])
-              ) {
-                wideReceivers.forEach((wideReceiver1: ProjectedPlayer) => {
+        runningbacks.forEach(
+          (runningback1: ProjectedPlayer, rb1Index: number) => {
+            this.logPlayer(runningback1), '1';
+            lineupSalaryTotal = this.calculateSalaryTotal([
+              quarterback,
+              runningback1,
+            ]);
+            if (lineupSalaryTotal <= maxSalariesAtPosition.RB1) {
+              runningbacks.forEach(
+                (runningback2: ProjectedPlayer, rb2Index: number) => {
                   lineupSalaryTotal = this.calculateSalaryTotal([
                     quarterback,
                     runningback1,
                     runningback2,
-                    wideReceiver1,
                   ]);
-                  if (lineupSalaryTotal <= maxSalariesAtPosition.WR1) {
-                    wideReceivers.forEach((wideReceiver2: ProjectedPlayer) => {
-                      lineupSalaryTotal = this.calculateSalaryTotal([
-                        quarterback,
-                        runningback1,
-                        runningback2,
-                        wideReceiver1,
-                        wideReceiver2,
-                      ]);
-                      if (
-                        lineupSalaryTotal <= maxSalariesAtPosition.WR2 &&
-                        !this.hasDuplicatePlayerIds([
+                  if (
+                    lineupSalaryTotal <= maxSalariesAtPosition.RB2 &&
+                    rb1Index < rb2Index
+                  ) {
+                    wideReceivers.forEach(
+                      (wideReceiver1: ProjectedPlayer, wr1Index: number) => {
+                        lineupSalaryTotal = this.calculateSalaryTotal([
+                          quarterback,
+                          runningback1,
+                          runningback2,
                           wideReceiver1,
-                          wideReceiver2,
-                        ])
-                      ) {
-                        wideReceivers.forEach(
-                          (wideReceiver3: ProjectedPlayer) => {
-                            lineupSalaryTotal = this.calculateSalaryTotal([
-                              quarterback,
-                              runningback1,
-                              runningback2,
-                              wideReceiver1,
-                              wideReceiver2,
-                              wideReceiver3,
-                            ]);
-                            if (
-                              lineupSalaryTotal <= maxSalariesAtPosition.WR3 &&
-                              !this.hasDuplicatePlayerIds([
-                                wideReceiver1,
-                                wideReceiver2,
-                                wideReceiver3,
-                              ])
-                            ) {
-                              tightEnds.forEach((tightEnd: ProjectedPlayer) => {
-                                lineupSalaryTotal = this.calculateSalaryTotal([
-                                  quarterback,
-                                  runningback1,
-                                  runningback2,
-                                  wideReceiver1,
-                                  wideReceiver2,
-                                  wideReceiver3,
-                                  tightEnd,
-                                ]);
-                                if (
-                                  lineupSalaryTotal <= maxSalariesAtPosition.TE
-                                ) {
-                                  flexOptions.forEach(
-                                    (flexOption: ProjectedPlayer) => {
-                                      lineupSalaryTotal = this.calculateSalaryTotal(
-                                        [
-                                          quarterback,
-                                          runningback1,
-                                          runningback2,
-                                          wideReceiver1,
-                                          wideReceiver2,
-                                          wideReceiver3,
-                                          tightEnd,
-                                          flexOption,
-                                        ]
-                                      );
-                                      if (
-                                        lineupSalaryTotal <=
-                                          maxSalariesAtPosition.FLEX &&
-                                        !this.hasDuplicatePlayerIds([
-                                          runningback1,
-                                          runningback2,
-                                          wideReceiver1,
-                                          wideReceiver2,
-                                          wideReceiver3,
-                                          tightEnd,
-                                          flexOption,
-                                        ])
-                                      ) {
-                                        defenses.forEach(
-                                          (defense: ProjectedPlayer) => {
-                                            lineupSalaryTotal = this.calculateSalaryTotal(
-                                              [
-                                                quarterback,
-                                                runningback1,
-                                                runningback2,
-                                                wideReceiver1,
-                                                wideReceiver2,
-                                                wideReceiver3,
-                                                tightEnd,
-                                                flexOption,
-                                                defense,
-                                              ]
-                                            );
-                                            const projectedPoints: number =
-                                              quarterback.projectedPoints +
-                                              runningback1.projectedPoints +
-                                              runningback2.projectedPoints +
-                                              wideReceiver1.projectedPoints +
-                                              wideReceiver2.projectedPoints +
-                                              wideReceiver3.projectedPoints +
-                                              tightEnd.projectedPoints +
-                                              flexOption.projectedPoints +
-                                              defense.projectedPoints;
-                                            const draftKingsLineup: DraftKingsLineup = {
-                                              QB: quarterback.playerId,
-                                              RB1: runningback1.playerId,
-                                              RB2: runningback2.playerId,
-                                              WR1: wideReceiver1.playerId,
-                                              WR2: wideReceiver2.playerId,
-                                              WR3: wideReceiver3.playerId,
-                                              TE: tightEnd.playerId,
-                                              FLEX: flexOption.playerId,
-                                              DST: defense.playerId,
-                                              projectedPoints: projectedPoints,
-                                              totalSalary: lineupSalaryTotal,
-                                            };
-                                            let lineupProcessResult = this.processLineup(
-                                              draftKingsLineup,
-                                              topLineups,
-                                              numLineups,
-                                              minIndex
-                                            );
-                                            minIndex =
-                                              lineupProcessResult.minIndex;
-                                            topLineups =
-                                              lineupProcessResult.topLineups;
-                                            lineupSalaryTotal = this.calculateSalaryTotal(
-                                              [
-                                                quarterback,
-                                                runningback1,
-                                                runningback2,
-                                                wideReceiver1,
-                                                wideReceiver2,
-                                                wideReceiver3,
-                                                tightEnd,
-                                                flexOption,
-                                              ]
-                                            );
-                                          }
-                                        );
-                                      } else {
-                                        lineupSalaryTotal = this.calculateSalaryTotal(
-                                          [
-                                            quarterback,
-                                            runningback1,
-                                            runningback2,
-                                            wideReceiver1,
-                                            wideReceiver2,
-                                            wideReceiver3,
-                                            tightEnd,
-                                          ]
-                                        );
-                                      }
-                                    }
-                                  );
-                                } else {
-                                  lineupSalaryTotal = this.calculateSalaryTotal(
-                                    [
-                                      quarterback,
-                                      runningback1,
-                                      runningback2,
-                                      wideReceiver1,
-                                      wideReceiver2,
-                                      wideReceiver3,
-                                    ]
-                                  );
-                                }
-                              });
-                            } else {
+                        ]);
+                        if (lineupSalaryTotal <= maxSalariesAtPosition.WR1) {
+                          wideReceivers.forEach(
+                            (
+                              wideReceiver2: ProjectedPlayer,
+                              wr2Index: number
+                            ) => {
                               lineupSalaryTotal = this.calculateSalaryTotal([
                                 quarterback,
                                 runningback1,
@@ -309,37 +152,231 @@ export class LineupOptimizer {
                                 wideReceiver1,
                                 wideReceiver2,
                               ]);
+                              if (
+                                lineupSalaryTotal <=
+                                  maxSalariesAtPosition.WR2 &&
+                                wr1Index < wr2Index
+                              ) {
+                                wideReceivers.forEach(
+                                  (
+                                    wideReceiver3: ProjectedPlayer,
+                                    wr3Index: number
+                                  ) => {
+                                    lineupSalaryTotal = this.calculateSalaryTotal(
+                                      [
+                                        quarterback,
+                                        runningback1,
+                                        runningback2,
+                                        wideReceiver1,
+                                        wideReceiver2,
+                                        wideReceiver3,
+                                      ]
+                                    );
+                                    if (
+                                      lineupSalaryTotal <=
+                                        maxSalariesAtPosition.WR3 &&
+                                      !this.hasDuplicatePlayerIds([
+                                        wideReceiver1,
+                                        wideReceiver2,
+                                        wideReceiver3,
+                                      ]) &&
+                                      wr1Index < wr3Index &&
+                                      wr2Index < wr3Index
+                                    ) {
+                                      tightEnds.forEach(
+                                        (tightEnd: ProjectedPlayer) => {
+                                          lineupSalaryTotal = this.calculateSalaryTotal(
+                                            [
+                                              quarterback,
+                                              runningback1,
+                                              runningback2,
+                                              wideReceiver1,
+                                              wideReceiver2,
+                                              wideReceiver3,
+                                              tightEnd,
+                                            ]
+                                          );
+                                          if (
+                                            lineupSalaryTotal <=
+                                            maxSalariesAtPosition.TE
+                                          ) {
+                                            flexOptions.forEach(
+                                              (flexOption: ProjectedPlayer) => {
+                                                lineupSalaryTotal = this.calculateSalaryTotal(
+                                                  [
+                                                    quarterback,
+                                                    runningback1,
+                                                    runningback2,
+                                                    wideReceiver1,
+                                                    wideReceiver2,
+                                                    wideReceiver3,
+                                                    tightEnd,
+                                                    flexOption,
+                                                  ]
+                                                );
+                                                if (
+                                                  lineupSalaryTotal <=
+                                                    maxSalariesAtPosition.FLEX &&
+                                                  !this.hasDuplicatePlayerIds([
+                                                    runningback1,
+                                                    runningback2,
+                                                    wideReceiver1,
+                                                    wideReceiver2,
+                                                    wideReceiver3,
+                                                    tightEnd,
+                                                    flexOption,
+                                                  ])
+                                                ) {
+                                                  defenses.forEach(
+                                                    (
+                                                      defense: ProjectedPlayer
+                                                    ) => {
+                                                      lineupSalaryTotal = this.calculateSalaryTotal(
+                                                        [
+                                                          quarterback,
+                                                          runningback1,
+                                                          runningback2,
+                                                          wideReceiver1,
+                                                          wideReceiver2,
+                                                          wideReceiver3,
+                                                          tightEnd,
+                                                          flexOption,
+                                                          defense,
+                                                        ]
+                                                      );
+                                                      if (
+                                                        lineupSalaryTotal <=
+                                                        50000
+                                                      ) {
+                                                        const projectedPoints: number =
+                                                          quarterback.projectedPoints +
+                                                          runningback1.projectedPoints +
+                                                          runningback2.projectedPoints +
+                                                          wideReceiver1.projectedPoints +
+                                                          wideReceiver2.projectedPoints +
+                                                          wideReceiver3.projectedPoints +
+                                                          tightEnd.projectedPoints +
+                                                          flexOption.projectedPoints +
+                                                          defense.projectedPoints;
+                                                        const draftKingsLineup: DraftKingsLineup = {
+                                                          QB:
+                                                            quarterback.playerId,
+                                                          RB1:
+                                                            runningback1.playerId,
+                                                          RB2:
+                                                            runningback2.playerId,
+                                                          WR1:
+                                                            wideReceiver1.playerId,
+                                                          WR2:
+                                                            wideReceiver2.playerId,
+                                                          WR3:
+                                                            wideReceiver3.playerId,
+                                                          TE: tightEnd.playerId,
+                                                          FLEX:
+                                                            flexOption.playerId,
+                                                          DST: defense.playerId,
+                                                          projectedPoints: projectedPoints,
+                                                          totalSalary: lineupSalaryTotal,
+                                                        };
+                                                        let lineupProcessResult = this.processLineup(
+                                                          draftKingsLineup,
+                                                          topLineups,
+                                                          numLineups,
+                                                          minIndex
+                                                        );
+                                                        minIndex =
+                                                          lineupProcessResult.minIndex;
+                                                        topLineups =
+                                                          lineupProcessResult.topLineups;
+                                                      }
+                                                      lineupSalaryTotal = this.calculateSalaryTotal(
+                                                        [
+                                                          quarterback,
+                                                          runningback1,
+                                                          runningback2,
+                                                          wideReceiver1,
+                                                          wideReceiver2,
+                                                          wideReceiver3,
+                                                          tightEnd,
+                                                          flexOption,
+                                                        ]
+                                                      );
+                                                    }
+                                                  );
+                                                } else {
+                                                  lineupSalaryTotal = this.calculateSalaryTotal(
+                                                    [
+                                                      quarterback,
+                                                      runningback1,
+                                                      runningback2,
+                                                      wideReceiver1,
+                                                      wideReceiver2,
+                                                      wideReceiver3,
+                                                      tightEnd,
+                                                    ]
+                                                  );
+                                                }
+                                              }
+                                            );
+                                          } else {
+                                            lineupSalaryTotal = this.calculateSalaryTotal(
+                                              [
+                                                quarterback,
+                                                runningback1,
+                                                runningback2,
+                                                wideReceiver1,
+                                                wideReceiver2,
+                                                wideReceiver3,
+                                              ]
+                                            );
+                                          }
+                                        }
+                                      );
+                                    } else {
+                                      lineupSalaryTotal = this.calculateSalaryTotal(
+                                        [
+                                          quarterback,
+                                          runningback1,
+                                          runningback2,
+                                          wideReceiver1,
+                                          wideReceiver2,
+                                        ]
+                                      );
+                                    }
+                                  }
+                                );
+                              } else {
+                                lineupSalaryTotal = this.calculateSalaryTotal([
+                                  quarterback,
+                                  runningback1,
+                                  runningback2,
+                                  wideReceiver1,
+                                ]);
+                              }
                             }
-                          }
-                        );
-                      } else {
-                        lineupSalaryTotal = this.calculateSalaryTotal([
-                          quarterback,
-                          runningback1,
-                          runningback2,
-                          wideReceiver1,
-                        ]);
+                          );
+                        } else {
+                          lineupSalaryTotal = this.calculateSalaryTotal([
+                            quarterback,
+                            runningback1,
+                            runningback2,
+                          ]);
+                        }
                       }
-                    });
+                    );
                   } else {
                     lineupSalaryTotal = this.calculateSalaryTotal([
                       quarterback,
                       runningback1,
-                      runningback2,
                     ]);
                   }
-                });
-              } else {
-                lineupSalaryTotal = this.calculateSalaryTotal([
-                  quarterback,
-                  runningback1,
-                ]);
-              }
-            });
-          } else {
-            lineupSalaryTotal = this.calculateSalaryTotal([quarterback]);
+                }
+              );
+            } else {
+              lineupSalaryTotal = this.calculateSalaryTotal([quarterback]);
+            }
           }
-        });
+        );
       } else {
         lineupSalaryTotal = 0;
       }

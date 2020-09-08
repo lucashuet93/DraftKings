@@ -122,7 +122,6 @@ export class SQLServerService {
             }
           );
           const valueString: string = recordValues.join(',');
-          console.log(valueString);
           const request: Request = new Request(
             `DELETE FROM [dbo].[DraftKingsLineups]; INSERT INTO [dbo].[DraftKingsLineups] (QB, RB1, RB2, WR1, WR2, WR3, TE, FLEX, DST, ProjectedPoints, TotalSalary) VALUES ${valueString};`,
             (err: Error) => {
