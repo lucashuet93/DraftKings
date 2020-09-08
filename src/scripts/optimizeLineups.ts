@@ -25,7 +25,8 @@ const optimizeLineups = async () => {
     rawPlayerProjections
   );
   const optimizedLineups: DraftKingsLineup[] = lineupOptimizer.optimizeLineups(
-    projectedPlayers
+    projectedPlayers,
+    150
   );
 };
 

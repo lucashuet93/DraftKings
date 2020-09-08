@@ -12,14 +12,14 @@ export class SalaryAnalyzer {
   }
 
   findMaxSalariesAtPositions(
-    runningBacks: ProjectedPlayer[],
+    runningbacks: ProjectedPlayer[],
     wideReceivers: ProjectedPlayer[],
     tightEnds: ProjectedPlayer[],
     flexOptions: ProjectedPlayer[],
     defenses: ProjectedPlayer[]
   ): MaxSalariesAtPosition {
     const maxSalary: number = 50000;
-    const minRBSalary: number = this.findMinSalaryAtPosition(runningBacks);
+    const minRBSalary: number = this.findMinSalaryAtPosition(runningbacks);
     const minWRSalary: number = this.findMinSalaryAtPosition(wideReceivers);
     const minTESalary: number = this.findMinSalaryAtPosition(tightEnds);
     const minFlexSalary: number = this.findMinSalaryAtPosition(flexOptions);
