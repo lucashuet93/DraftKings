@@ -2,6 +2,7 @@ import {
   DraftKingsLineup,
   MaxSalariesAtPosition,
   ProjectedPlayer,
+  LineupProcessResult,
 } from '../models';
 import { SalaryAnalyzer } from './SalaryAnalyzer';
 
@@ -38,18 +39,27 @@ export class LineupOptimizer {
   processLineup(
     lineup: DraftKingsLineup,
     topLineups: DraftKingsLineup[],
-    numLineups: number
-  ): DraftKingsLineup[] {
+    numLineups: number,
+    minIndex: number
+  ): LineupProcessResult {
     let newLineups: DraftKingsLineup[] = [...topLineups];
+    let newMinIndex: number = minIndex;
     if (newLineups.length < numLineups) {
+      // push lineup into array immediately and find min index
       newLineups.push(lineup);
+      newMinIndex = this.findMinIndex(newLineups);
     } else {
-      const minIndex: number = this.findMinIndex(newLineups);
       if (newLineups[minIndex].projectedPoints < lineup.projectedPoints) {
+        // swap min lineup for new lineup and find min index
         newLineups[minIndex] = lineup;
+        newMinIndex = this.findMinIndex(newLineups);
       }
     }
-    return newLineups;
+    const lineupProcessResult: LineupProcessResult = {
+      topLineups: newLineups,
+      minIndex: newMinIndex,
+    };
+    return lineupProcessResult;
   }
 
   findMinIndex(topLineups: DraftKingsLineup[]): number {
@@ -69,6 +79,7 @@ export class LineupOptimizer {
     numLineups: number
   ): DraftKingsLineup[] {
     let topLineups: DraftKingsLineup[] = [];
+    let minIndex: number = 0;
     const quarterbacks: ProjectedPlayer[] = playerProjections.filter(
       (player: ProjectedPlayer) => player.position === 'QB'
     );
@@ -120,7 +131,6 @@ export class LineupOptimizer {
                 !this.hasDuplicatePlayerIds([runningback1, runningback2])
               ) {
                 wideReceivers.forEach((wideReceiver1: ProjectedPlayer) => {
-                  this.logPlayer(wideReceiver1, '1');
                   lineupSalaryTotal = this.calculateSalaryTotal([
                     quarterback,
                     runningback1,
@@ -129,7 +139,6 @@ export class LineupOptimizer {
                   ]);
                   if (lineupSalaryTotal <= maxSalariesAtPosition.WR1) {
                     wideReceivers.forEach((wideReceiver2: ProjectedPlayer) => {
-                      this.logPlayer(wideReceiver2, '2');
                       lineupSalaryTotal = this.calculateSalaryTotal([
                         quarterback,
                         runningback1,
@@ -240,11 +249,16 @@ export class LineupOptimizer {
                                               projectedPoints: projectedPoints,
                                               totalSalary: lineupSalaryTotal,
                                             };
-                                            topLineups = this.processLineup(
+                                            let lineupProcessResult = this.processLineup(
                                               draftKingsLineup,
                                               topLineups,
-                                              numLineups
+                                              numLineups,
+                                              minIndex
                                             );
+                                            minIndex =
+                                              lineupProcessResult.minIndex;
+                                            topLineups =
+                                              lineupProcessResult.topLineups;
                                             lineupSalaryTotal = this.calculateSalaryTotal(
                                               [
                                                 quarterback,

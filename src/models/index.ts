@@ -5,3 +5,4 @@ export * from './ProjectedPlayer';
 export * from './RotoGrindersPlayer';
 export * from './DraftKingsLineup';
 export * from './MaxSalariesAtPosition';
+export * from './LineupProcessResult';
