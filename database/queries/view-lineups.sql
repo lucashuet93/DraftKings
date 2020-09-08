@@ -9,3 +9,4 @@ INNER JOIN [dbo].[DraftKingsAvailables] f ON l.WR3=f.PlayerId
 INNER JOIN [dbo].[DraftKingsAvailables] g ON l.TE=g.PlayerId
 INNER JOIN [dbo].[DraftKingsAvailables] h ON l.FLEX=h.PlayerId
 INNER JOIN [dbo].[DraftKingsAvailables] i ON l.DST=i.PlayerId
+ORDER BY l.ProjectedPoints DESC
