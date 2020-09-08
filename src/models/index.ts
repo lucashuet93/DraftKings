@@ -4,3 +4,4 @@ export * from './NumberFirePlayer';
 export * from './ProjectedPlayer';
 export * from './RotoGrindersPlayer';
 export * from './DraftKingsLineup';
+export * from './MaxSalariesAtPosition';
