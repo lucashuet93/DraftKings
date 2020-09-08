@@ -28,6 +28,7 @@ const optimizeLineups = async () => {
     projectedPlayers,
     150
   );
+  await sqlServerService.saveTopLineups(optimizedLineups);
 };
 
 optimizeLineups();

@@ -76,3 +76,17 @@ CREATE TABLE PlayerProjections (
     ProjectedValue float,,
     AveragePPG float
 );
+
+CREATE TABLE DraftKingsLineups (
+    QB varchar(255),
+    RB1 varchar(255),
+    RB2 varchar(255),
+    WR1 varchar(255),
+    WR2 varchar(255),
+    WR3 varchar(255),
+    TE varchar(255),
+    FLEX varchar(255),
+    DST varchar(255),
+    ProjectedPoints float,
+    TotalSalary int
+);

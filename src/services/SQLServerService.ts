@@ -1,5 +1,5 @@
 import { Connection, ConnectionConfig, Request, ColumnValue } from 'tedious';
-import { ProjectedPlayer } from '../models';
+import { ProjectedPlayer, DraftKingsLineup } from '../models';
 
 export class SQLServerService {
   createConnection(): Connection {
@@ -97,6 +97,34 @@ export class SQLServerService {
           const valueString: string = recordValues.join(',');
           const request: Request = new Request(
             `DELETE FROM [dbo].[PlayerProjections]; INSERT INTO [dbo].[PlayerProjections] (FirstName, LastName, PlayerId, Position, Salary, Team, Opponent, RotoGrindersProjection, NumberFireProjection, DailyFantasyFuelProjection, ProjectedPoints, ProjectedValue, AveragePPG) VALUES ${valueString};`,
+            (err: Error) => {
+              if (err) {
+                reject(err);
+              }
+            }
+          );
+          connection.execSql(request);
+        }
+      });
+    });
+  }
+
+  async saveTopLineups(topLineups: DraftKingsLineup[]): Promise<void> {
+    const connection: Connection = this.createConnection();
+    return new Promise<void>((resolve: Function, reject: Function) => {
+      connection.on('connect', (err: Error) => {
+        if (err) {
+          reject(err);
+        } else {
+          const recordValues: string[] = topLineups.map(
+            (lineup: DraftKingsLineup) => {
+              return `('${lineup.QB}','${lineup.RB1}','${lineup.RB2}',${lineup.WR1},'${lineup.WR2}','${lineup.WR3}','${lineup.TE}','${lineup.FLEX}','${lineup.DST}',${lineup.projectedPoints},${lineup.totalSalary})`;
+            }
+          );
+          const valueString: string = recordValues.join(',');
+          console.log(valueString);
+          const request: Request = new Request(
+            `DELETE FROM [dbo].[DraftKingsLineups]; INSERT INTO [dbo].[DraftKingsLineups] (QB, RB1, RB2, WR1, WR2, WR3, TE, FLEX, DST, ProjectedPoints, TotalSalary) VALUES ${valueString};`,
             (err: Error) => {
               if (err) {
                 reject(err);
