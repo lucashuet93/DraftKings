@@ -28,14 +28,6 @@ export class LineupOptimizer {
     return hasDuplicates;
   }
 
-  logPlayer(player: ProjectedPlayer, index: string = ''): void {
-    console.log(
-      `Processing ${player.position}${index} ${player.firstName
-        .concat(' ')
-        .concat(player.lastName)}`
-    );
-  }
-
   processLineup(
     lineup: DraftKingsLineup,
     topLineups: DraftKingsLineup[],
@@ -108,13 +100,14 @@ export class LineupOptimizer {
       flexOptions,
       defenses
     );
-    quarterbacks.forEach((quarterback: ProjectedPlayer) => {
-      this.logPlayer(quarterback);
+    quarterbacks.forEach((quarterback: ProjectedPlayer, index: number) => {
+      console.log(
+        `Processing QB${index} ${quarterback.firstName} ${quarterback.lastName}`
+      );
       let lineupSalaryTotal: number = this.calculateSalaryTotal([quarterback]);
       if (lineupSalaryTotal <= maxSalariesAtPosition.QB) {
         runningbacks.forEach(
           (runningback1: ProjectedPlayer, rb1Index: number) => {
-            this.logPlayer(runningback1), '1';
             lineupSalaryTotal = this.calculateSalaryTotal([
               quarterback,
               runningback1,

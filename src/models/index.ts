@@ -6,3 +6,4 @@ export * from './RotoGrindersPlayer';
 export * from './DraftKingsLineup';
 export * from './MaxSalariesAtPosition';
 export * from './LineupProcessResult';
+export * from './LineupStatistics';

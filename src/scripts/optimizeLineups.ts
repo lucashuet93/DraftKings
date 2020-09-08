@@ -1,10 +1,12 @@
 import { config } from 'dotenv';
 import { ColumnValue } from 'tedious';
 import {
+  LineupAnalyzer,
   LineupOptimizer,
   PlayerParser,
   SQLServerService,
   SalaryAnalyzer,
+  Timer,
 } from '../services';
 import { ProjectedPlayer, DraftKingsLineup } from '../models';
 
@@ -17,7 +19,10 @@ const optimizeLineups = async () => {
   const playerParser: PlayerParser = new PlayerParser();
   const salaryAnalyzer: SalaryAnalyzer = new SalaryAnalyzer();
   const lineupOptimizer: LineupOptimizer = new LineupOptimizer(salaryAnalyzer);
+  const lineupAnalyzer: LineupAnalyzer = new LineupAnalyzer();
+  const timer: Timer = new Timer();
 
+  timer.start();
   const rawPlayerProjections: ColumnValue[][] = await sqlServerService.loadRawPlayerData(
     'PlayerProjections'
   );
@@ -28,7 +33,15 @@ const optimizeLineups = async () => {
     projectedPlayers,
     150
   );
-  await sqlServerService.saveTopLineups(optimizedLineups);
+  lineupAnalyzer.printLineupStatistics(projectedPlayers, optimizedLineups);
+  await sqlServerService.saveTopLineups(optimizedLineups, () => {
+    const elapsedMilliseconds: number = timer.end();
+    const elapsedTime: string = timer.getTimeStringFromMilliseconds(
+      elapsedMilliseconds
+    );
+    console.log(`Time Elapsed - ${elapsedTime}`);
+    process.exit();
+  });
 };
 
 optimizeLineups();

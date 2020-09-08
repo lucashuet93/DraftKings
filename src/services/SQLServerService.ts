@@ -62,7 +62,8 @@ export class SQLServerService {
   async savePlayerProjections(
     playerProjections: ProjectedPlayer[],
     minProjectedPoints: number,
-    minProjectionServices: number
+    minProjectionServices: number,
+    onComplete: () => void
   ): Promise<void> {
     const connection: Connection = this.createConnection();
     return new Promise<void>((resolve: Function, reject: Function) => {
@@ -103,13 +104,19 @@ export class SQLServerService {
               }
             }
           );
+          request.on('doneProc', () => {
+            onComplete();
+          });
           connection.execSql(request);
         }
       });
     });
   }
 
-  async saveTopLineups(topLineups: DraftKingsLineup[]): Promise<void> {
+  async saveTopLineups(
+    topLineups: DraftKingsLineup[],
+    onComplete: () => void
+  ): Promise<void> {
     const connection: Connection = this.createConnection();
     return new Promise<void>((resolve: Function, reject: Function) => {
       connection.on('connect', (err: Error) => {
@@ -130,6 +137,9 @@ export class SQLServerService {
               }
             }
           );
+          request.on('doneProc', () => {
+            onComplete();
+          });
           connection.execSql(request);
         }
       });

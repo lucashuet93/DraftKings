@@ -4,6 +4,7 @@ import {
   PlayerParser,
   PlayerProjectionService,
   SQLServerService,
+  Timer,
 } from '../services';
 import {
   RotoGrindersPlayer,
@@ -21,7 +22,9 @@ const projectPlayers = async () => {
   const sqlServerService: SQLServerService = new SQLServerService();
   const playerParser: PlayerParser = new PlayerParser();
   const playerProjectionService: PlayerProjectionService = new PlayerProjectionService();
+  const timer: Timer = new Timer();
 
+  timer.start();
   const rawDraftKingsAvailablesData: ColumnValue[][] = await sqlServerService.loadRawPlayerData(
     'DraftKingsAvailables'
   );
@@ -53,7 +56,14 @@ const projectPlayers = async () => {
     numberFirePlayers,
     dailyFantasyFuelPlayers
   );
-  await sqlServerService.savePlayerProjections(playerProjections, 3, 2);
+  await sqlServerService.savePlayerProjections(playerProjections, 3, 2, () => {
+    const elapsedMilliseconds: number = timer.end();
+    const elapsedTime: string = timer.getTimeStringFromMilliseconds(
+      elapsedMilliseconds
+    );
+    console.log(`Time Elapsed - ${elapsedTime}`);
+    process.exit();
+  });
 };
 
 projectPlayers();
