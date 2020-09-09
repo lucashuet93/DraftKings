@@ -96,7 +96,7 @@ export class LineupOptimizer {
 
   findMinIndex(topLineups: DraftKingsLineup[]): number {
     let minIndex: number = 0;
-    let minProjectedPoints = topLineups[0].projectedPoints;
+    let minProjectedPoints: number = topLineups[0].projectedPoints;
     topLineups.forEach((lineup: DraftKingsLineup, index: number) => {
       if (lineup.projectedPoints < minProjectedPoints) {
         minProjectedPoints = lineup.projectedPoints;
@@ -311,7 +311,7 @@ export class LineupOptimizer {
                                                           projectedPoints: projectedPoints,
                                                           totalSalary: lineupSalaryTotal,
                                                         };
-                                                        let lineupProcessResult = this.processLineup(
+                                                        const lineupProcessResult: LineupProcessResult = this.processLineup(
                                                           draftKingsLineup,
                                                           topLineups,
                                                           numLineups,

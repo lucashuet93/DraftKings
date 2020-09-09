@@ -65,7 +65,7 @@ export class PlayerProjectionService {
             );
           }
         );
-        const averageProjectedPoints = this.projectPointTotal(
+        const averageProjectedPoints: number = this.projectPointTotal(
           linkedRotoGrindersPlayer,
           linkedNumberFirePlayer,
           linkedDailyFantasyFuelPlayer
