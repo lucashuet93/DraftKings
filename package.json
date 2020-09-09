@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@types/tedious": "^4.0.1",
+    "csv-writer": "^1.6.0",
     "dotenv": "^8.2.0",
     "tedious": "^9.2.1"
   }
