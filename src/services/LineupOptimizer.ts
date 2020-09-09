@@ -28,6 +28,43 @@ export class LineupOptimizer {
     return hasDuplicates;
   }
 
+  lineupCombinationDoesNotExist(
+    lineup: DraftKingsLineup,
+    topLineups: DraftKingsLineup[]
+  ): boolean {
+    const lineupPlayerIds: string[] = [
+      lineup.QB,
+      lineup.RB1,
+      lineup.RB2,
+      lineup.WR1,
+      lineup.WR2,
+      lineup.WR3,
+      lineup.TE,
+      lineup.FLEX,
+      lineup.DST,
+    ].sort();
+    const duplicateLineup: DraftKingsLineup | undefined = topLineups.find(
+      (topLineup: DraftKingsLineup) => {
+        const topLineupPlayerIds: string[] = [
+          topLineup.QB,
+          topLineup.RB1,
+          topLineup.RB2,
+          topLineup.WR1,
+          topLineup.WR2,
+          topLineup.WR3,
+          topLineup.TE,
+          topLineup.FLEX,
+          topLineup.DST,
+        ].sort();
+        const idsAreEqual: boolean =
+          JSON.stringify(lineupPlayerIds) ===
+          JSON.stringify(topLineupPlayerIds);
+        return idsAreEqual;
+      }
+    );
+    return duplicateLineup === undefined;
+  }
+
   processLineup(
     lineup: DraftKingsLineup,
     topLineups: DraftKingsLineup[],
@@ -41,7 +78,10 @@ export class LineupOptimizer {
       newLineups.push(lineup);
       newMinIndex = this.findMinIndex(newLineups);
     } else {
-      if (newLineups[minIndex].projectedPoints < lineup.projectedPoints) {
+      if (
+        newLineups[minIndex].projectedPoints < lineup.projectedPoints &&
+        this.lineupCombinationDoesNotExist(lineup, topLineups)
+      ) {
         // swap min lineup for new lineup and find min index
         newLineups[minIndex] = lineup;
         newMinIndex = this.findMinIndex(newLineups);
