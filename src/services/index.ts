@@ -5,3 +5,4 @@ export * from './SalaryAnalyzer';
 export * from './LineupAnalyzer';
 export * from './LineupOptimizer';
 export * from './Timer';
+export * from './CSVFileWriter';

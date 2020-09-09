@@ -17,14 +17,16 @@ import {
 // load environment variables
 config();
 
+// wrap logic in async function so await keyword can be used
 const projectPlayers = async () => {
-  // wrap logic in async function so await keyword can be used
+  // initialize services
   const sqlServerService: SQLServerService = new SQLServerService();
   const playerParser: PlayerParser = new PlayerParser();
   const playerProjectionService: PlayerProjectionService = new PlayerProjectionService();
   const timer: Timer = new Timer();
-
   timer.start();
+
+  // load service projections
   const rawDraftKingsAvailablesData: ColumnValue[][] = await sqlServerService.loadRawPlayerData(
     'DraftKingsAvailables'
   );
@@ -37,7 +39,6 @@ const projectPlayers = async () => {
   const rawDailyFantasyFuelData: ColumnValue[][] = await sqlServerService.loadRawPlayerData(
     'DailyFantasyFuel'
   );
-
   const draftKingsAvailablePlayers: DraftKingsAvailablePlayer[] = playerParser.parseDraftKingsAvailablePlayers(
     rawDraftKingsAvailablesData
   );
@@ -50,12 +51,16 @@ const projectPlayers = async () => {
   const dailyFantasyFuelPlayers: DailyFantasyFuelPlayer[] = playerParser.parseDailyFantasyFuelPlayers(
     rawDailyFantasyFuelData
   );
+
+  // project players
   const playerProjections: ProjectedPlayer[] = playerProjectionService.projectPlayers(
     draftKingsAvailablePlayers,
     rotoGrindersPlayers,
     numberFirePlayers,
     dailyFantasyFuelPlayers
   );
+
+  // print stats and save projections
   await sqlServerService.savePlayerProjections(playerProjections, 3, 2, () => {
     const elapsedMilliseconds: number = timer.end();
     const elapsedTime: string = timer.getTimeStringFromMilliseconds(
