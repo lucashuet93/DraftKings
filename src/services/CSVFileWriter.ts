@@ -21,7 +21,7 @@ export class CSVFileWriter {
     });
   }
 
-  async writeLineupsToFile(lineups: DraftKingsLineup[]) {
+  async writeLineupsToFile(lineups: DraftKingsLineup[]): Promise<void> {
     await this.csvWriter.writeRecords(lineups);
   }
 }

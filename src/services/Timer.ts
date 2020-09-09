@@ -1,7 +1,7 @@
 export class Timer {
   startTime!: Date;
 
-  start() {
+  start(): void {
     this.startTime = new Date();
   }
 
