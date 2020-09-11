@@ -15,7 +15,7 @@ CREATE TABLE NumberFire (
     ProjectedPoints float,
     Salary int,
     ProjectedValue float,
-    CompletionsOverAttempts varchar(255),
+    CompletionsOverAtt varchar(255),
     PassingYds int,
     PassingTds int,
     PassingInts int,
@@ -52,13 +52,80 @@ CREATE TABLE DailyFantasyFuel (
 );
 
 CREATE TABLE RotoGrinders (
+    PlayerId varchar(255),
+    Team varchar(255),
+    Opponent varchar(255),
+    Position varchar(255),
     FullName varchar(255),
-    Salary varchar(255),
+    ProjectedPoints float,
+    ProjectedOwnership float,
+    Ceiling float,
+    Floor float,
+    MinExposure float,
+    MaxExposure float,
+);
+
+CREATE TABLE FantasyData (
+    Rank int,
+    FullName varchar(255),
     Team varchar(255),
     Position varchar(255),
+    Week int,
     Opponent varchar(255),
+    PassingYds float,
+    PassingTds float,
+    PassingInts float,
+    RushingYds float,
+    RushingTds float,
+    Receptions float,
+    ReceivingYds float,
+    ReceivingTds float,
+    Sacks float,
+    Interceptions float,
+    FumblesForced float,
+    FumblesRecovered float,
     ProjectedPoints float,
-    ProjectedValue float
+    AveragePPG float
+);
+
+CREATE TABLE DailyFantasyNerd (
+    FullName varchar(255),
+    Likes int,
+    InjuryStatus varchar(255),
+    Position varchar(255),
+    Salary int,
+    Team varchar(255),
+    Opponent varchar(255),
+    VegasPoints float,
+    VegasSpread varchar(255),
+    DefensePassingYdsPerGame varchar(255),
+    DefenseRushingYdsPerGame varchar(255),
+    DefenseVsPosition varchar(255),
+    Last3PassingAtt float,
+    SeasonPassingAtt float,
+    ProjectedPassingAtt float,
+    RedZonePassingAtt float,
+    YardsPerPassingAtt float,
+    Last3RushingAtt float,
+    SeasonRushingAtt float,
+    ProjectedRushingAtt float,
+    RedZoneRushingAtt float,
+    YardsPerRushingAtt float,
+    Last3Targets float,
+    SeasonTargets float,
+    ProjectedTargets float,
+    RedZoneTargets float,
+    YardsPerTarget float,
+    ProjectedUsage float,
+    Last3PPG float,
+    Last16PPG float,
+    AveragePPG float,
+    Floor float,
+    Ceiling float,
+    ProjectedPoints float,
+    ProjectedValue float,
+    ActualPoints float,
+    ActualValue float
 );
 
 CREATE TABLE PlayerProjections (
@@ -72,8 +139,10 @@ CREATE TABLE PlayerProjections (
     RotoGrindersProjection float,
     NumberFireProjection float,
     DailyFantasyFuelProjection float,
+    FantasyDataProjection float,
+    DailyFantasyNerdProjection float,
     ProjectedPoints float,
-    ProjectedValue float,,
+    ProjectedValue float,
     AveragePPG float
 );
 
