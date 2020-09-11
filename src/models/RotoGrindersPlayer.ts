@@ -1,9 +1,13 @@
 export interface RotoGrindersPlayer {
-  fullName: string;
-  salary: number;
+  playerId: string;
   team: string;
-  position: string;
   opponent: string;
+  position: string;
+  fullName: string;
   projectedPoints: number;
-  projectedValue: number;
+  projectedOwnership: number;
+  ceiling: number;
+  floor: number;
+  minExposure: number;
+  maxExposure: number;
 }

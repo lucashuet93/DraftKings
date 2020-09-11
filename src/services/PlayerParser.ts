@@ -5,6 +5,8 @@ import {
   NumberFirePlayer,
   DraftKingsAvailablePlayer,
   ProjectedPlayer,
+  FantasyDataPlayer,
+  DailyFantasyNerdPlayer,
 } from '../models';
 
 export class PlayerParser {
@@ -131,11 +133,6 @@ export class PlayerParser {
     return defenseName;
   }
 
-  parseRotoGrinderPlayerSalary(dollarAmount: string): number {
-    const value: string = dollarAmount.split('$')[1].split('K')[0];
-    return parseFloat(value) * 1000;
-  }
-
   retrieveColumnValue<T>(row: ColumnValue[], columnName: string): T {
     return row.find(
       (column: ColumnValue) => column.metadata.colName === columnName
@@ -152,8 +149,13 @@ export class PlayerParser {
         .concat(' ')
         .concat(segments[1]);
       // ensure DJs and DKs are normalized
-      const djNormalized: string = fullNameWithoutSuffix.replace('D.J.', 'DJ');
-      const normalized: string = djNormalized.replace('D.K.', 'DK');
+      const normalized: string = fullNameWithoutSuffix
+        .replace('D.J.', 'DJ')
+        .replace('D.K.', 'DK')
+        .replace('T.J.', 'TJ')
+        .replace('K.J.', 'KJ')
+        .replace('P.J.', 'PJ')
+        .replace('J.K.', 'JK');
       return normalized;
     }
   }
@@ -180,6 +182,14 @@ export class PlayerParser {
           dailyFantasyFuelProjection: this.retrieveColumnValue<number>(
             row,
             'DailyFantasyFuelProjection'
+          ),
+          fantasyDataProjection: this.retrieveColumnValue<number>(
+            row,
+            'FantasyDataProjection'
+          ),
+          dailyFantasyNerdProjection: this.retrieveColumnValue<number>(
+            row,
+            'DailyFantasyNerdProjection'
           ),
           projectedPoints: this.retrieveColumnValue<number>(
             row,
@@ -240,16 +250,175 @@ export class PlayerParser {
           'Position'
         );
         const rotoGrindersPlayer: RotoGrindersPlayer = {
+          playerId: this.retrieveColumnValue<string>(row, 'PlayerId'),
+          team: this.retrieveColumnValue<string>(row, 'Team'),
+          opponent: this.retrieveColumnValue<string>(row, 'Opponent'),
+          position: position,
           fullName: this.normalizePlayerFullName(
             this.retrieveColumnValue<string>(row, 'FullName'),
             position
           ),
-          salary: this.parseRotoGrinderPlayerSalary(
-            this.retrieveColumnValue<string>(row, 'Salary')
+          projectedPoints: this.retrieveColumnValue<number>(
+            row,
+            'ProjectedPoints'
+          ),
+          projectedOwnership: this.retrieveColumnValue<number>(
+            row,
+            'ProjectedOwnership'
+          ),
+          ceiling: this.retrieveColumnValue<number>(row, 'Ceiling'),
+          floor: this.retrieveColumnValue<number>(row, 'Floor'),
+          minExposure: this.retrieveColumnValue<number>(row, 'MinExposure'),
+          maxExposure: this.retrieveColumnValue<number>(row, 'MaxExposure'),
+        };
+        return rotoGrindersPlayer;
+      }
+    );
+    return rotoGrindersPlayers;
+  }
+
+  parseFantasyDataPlayers(tableData: ColumnValue[][]): FantasyDataPlayer[] {
+    const fantasyDataPlayers: FantasyDataPlayer[] = tableData.map(
+      (row: ColumnValue[]) => {
+        const position: string = this.retrieveColumnValue<string>(
+          row,
+          'Position'
+        );
+        const fantasyDataPlayer: FantasyDataPlayer = {
+          rank: this.retrieveColumnValue<number>(row, 'Rank'),
+          fullName: this.normalizePlayerFullName(
+            this.retrieveColumnValue<string>(row, 'FullName'),
+            position
           ),
           team: this.retrieveColumnValue<string>(row, 'Team'),
           position: position,
+          week: this.retrieveColumnValue<number>(row, 'Week'),
           opponent: this.retrieveColumnValue<string>(row, 'Opponent'),
+          passingYds: this.retrieveColumnValue<number>(row, 'PassingYds'),
+          passingTds: this.retrieveColumnValue<number>(row, 'PassingTds'),
+          passingInts: this.retrieveColumnValue<number>(row, 'PassingInts'),
+          rushingYds: this.retrieveColumnValue<number>(row, 'RushingYds'),
+          rushingTds: this.retrieveColumnValue<number>(row, 'RushingTds'),
+          receptions: this.retrieveColumnValue<number>(row, 'Receptions'),
+          receivingYds: this.retrieveColumnValue<number>(row, 'ReceivingYds'),
+          receivingTds: this.retrieveColumnValue<number>(row, 'ReceivingTds'),
+          sacks: this.retrieveColumnValue<number>(row, 'Sacks'),
+          interceptions: this.retrieveColumnValue<number>(row, 'Interceptions'),
+          fumblesForced: this.retrieveColumnValue<number>(row, 'FumblesForced'),
+          fumblesRecovered: this.retrieveColumnValue<number>(
+            row,
+            'FumblesRecovered'
+          ),
+          projectedPoints: this.retrieveColumnValue<number>(
+            row,
+            'ProjectedPoints'
+          ),
+          averagePPG: this.retrieveColumnValue<number>(row, 'AveragePPG'),
+        };
+        return fantasyDataPlayer;
+      }
+    );
+    return fantasyDataPlayers;
+  }
+
+  parseDailyFantasyNerdPlayers(
+    tableData: ColumnValue[][]
+  ): DailyFantasyNerdPlayer[] {
+    const dailyFantasyNerdPlayers: DailyFantasyNerdPlayer[] = tableData.map(
+      (row: ColumnValue[]) => {
+        const retrievedPosition: string = this.retrieveColumnValue<string>(
+          row,
+          'Position'
+        );
+        const position = retrievedPosition === 'D' ? 'DST' : retrievedPosition;
+        const dailyFantasyNerdPlayer: DailyFantasyNerdPlayer = {
+          fullName: this.normalizePlayerFullName(
+            this.retrieveColumnValue<string>(row, 'FullName'),
+            position
+          ),
+          likes: this.retrieveColumnValue<number>(row, 'Likes'),
+          injuryStatus: this.retrieveColumnValue<string>(row, 'InjuryStatus'),
+          position: position,
+          salary: this.retrieveColumnValue<number>(row, 'Salary'),
+          team: this.retrieveColumnValue<string>(row, 'Team'),
+          opponent: this.retrieveColumnValue<string>(row, 'Opponent'),
+          vegasPoints: this.retrieveColumnValue<number>(row, 'VegasPoints'),
+          vegasSpread: this.retrieveColumnValue<string>(row, 'VegasSpread'),
+          defensePassingYdsPerGame: this.retrieveColumnValue<string>(
+            row,
+            'DefensePassingYdsPerGame'
+          ),
+          defenseRushingYdsPerGame: this.retrieveColumnValue<string>(
+            row,
+            'DefenseRushingYdsPerGame'
+          ),
+          defenseVsPosition: this.retrieveColumnValue<string>(
+            row,
+            'DefenseVsPosition'
+          ),
+          last3PassingAtt: this.retrieveColumnValue<number>(
+            row,
+            'Last3PassingAtt'
+          ),
+          seasonPassingAtt: this.retrieveColumnValue<number>(
+            row,
+            'SeasonPassingAtt'
+          ),
+          projectedPassingAtt: this.retrieveColumnValue<number>(
+            row,
+            'ProjectedPassingAtt'
+          ),
+          redZonePassingAtt: this.retrieveColumnValue<number>(
+            row,
+            'RedZonePassingAtt'
+          ),
+          yardsPerPassingAtt: this.retrieveColumnValue<number>(
+            row,
+            'YardsPerPassingAtt'
+          ),
+          last3RushingAtt: this.retrieveColumnValue<number>(
+            row,
+            'Last3RushingAtt'
+          ),
+          seasonRushingAtt: this.retrieveColumnValue<number>(
+            row,
+            'SeasonRushingAtt'
+          ),
+          projectedRushingAtt: this.retrieveColumnValue<number>(
+            row,
+            'ProjectedRushingAtt'
+          ),
+          redZoneRushingAtt: this.retrieveColumnValue<number>(
+            row,
+            'RedZoneRushingAtt'
+          ),
+          yardsPerRushingAtt: this.retrieveColumnValue<number>(
+            row,
+            'YardsPerRushingAtt'
+          ),
+          last3Targets: this.retrieveColumnValue<number>(row, 'Last3Targets'),
+          seasonTargets: this.retrieveColumnValue<number>(row, 'SeasonTargets'),
+          projectedTargets: this.retrieveColumnValue<number>(
+            row,
+            'ProjectedTargets'
+          ),
+          redZoneTargets: this.retrieveColumnValue<number>(
+            row,
+            'RedZoneTargets'
+          ),
+          yardsPerTarget: this.retrieveColumnValue<number>(
+            row,
+            'YardsPerTarget'
+          ),
+          projectedUsage: this.retrieveColumnValue<number>(
+            row,
+            'ProjectedUsage'
+          ),
+          last3PPG: this.retrieveColumnValue<number>(row, 'Last3PPG'),
+          last16PPG: this.retrieveColumnValue<number>(row, 'Last16PPG'),
+          averagePPG: this.retrieveColumnValue<number>(row, 'AveragePPG'),
+          floor: this.retrieveColumnValue<number>(row, 'Floor'),
+          ceiling: this.retrieveColumnValue<number>(row, 'Ceiling'),
           projectedPoints: this.retrieveColumnValue<number>(
             row,
             'ProjectedPoints'
@@ -258,11 +427,13 @@ export class PlayerParser {
             row,
             'ProjectedValue'
           ),
+          actualPoints: this.retrieveColumnValue<number>(row, 'ActualPoints'),
+          actualValue: this.retrieveColumnValue<number>(row, 'ActualValue'),
         };
-        return rotoGrindersPlayer;
+        return dailyFantasyNerdPlayer;
       }
     );
-    return rotoGrindersPlayers;
+    return dailyFantasyNerdPlayers;
   }
 
   parseDailyFantasyFuelPlayers(
@@ -348,9 +519,9 @@ export class PlayerParser {
             row,
             'ProjectedValue'
           ),
-          completionsOverAttempts: this.retrieveColumnValue<string>(
+          completionsOverAtt: this.retrieveColumnValue<string>(
             row,
-            'CompletionsOverAttempts'
+            'CompletionsOverAtt'
           ),
           passingYds: this.retrieveColumnValue<number>(row, 'PassingYds'),
           passingTds: this.retrieveColumnValue<number>(row, 'PassingTds'),

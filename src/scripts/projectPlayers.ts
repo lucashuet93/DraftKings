@@ -12,6 +12,8 @@ import {
   NumberFirePlayer,
   DraftKingsAvailablePlayer,
   ProjectedPlayer,
+  DailyFantasyNerdPlayer,
+  FantasyDataPlayer,
 } from '../models';
 
 // load environment variables
@@ -39,6 +41,12 @@ const projectPlayers = async () => {
   const rawDailyFantasyFuelData: ColumnValue[][] = await sqlServerService.loadRawPlayerData(
     'DailyFantasyFuel'
   );
+  const rawFantasyData: ColumnValue[][] = await sqlServerService.loadRawPlayerData(
+    'FantasyData'
+  );
+  const rawDailyFantasyNerdData: ColumnValue[][] = await sqlServerService.loadRawPlayerData(
+    'DailyFantasyNerd'
+  );
   const draftKingsAvailablePlayers: DraftKingsAvailablePlayer[] = playerParser.parseDraftKingsAvailablePlayers(
     rawDraftKingsAvailablesData
   );
@@ -51,17 +59,25 @@ const projectPlayers = async () => {
   const dailyFantasyFuelPlayers: DailyFantasyFuelPlayer[] = playerParser.parseDailyFantasyFuelPlayers(
     rawDailyFantasyFuelData
   );
+  const fantasyDataPlayers: FantasyDataPlayer[] = playerParser.parseFantasyDataPlayers(
+    rawFantasyData
+  );
+  const dailyFantasyNerdPlayers: DailyFantasyNerdPlayer[] = playerParser.parseDailyFantasyNerdPlayers(
+    rawDailyFantasyNerdData
+  );
 
   // project players
   const playerProjections: ProjectedPlayer[] = playerProjectionService.projectPlayers(
     draftKingsAvailablePlayers,
     rotoGrindersPlayers,
     numberFirePlayers,
-    dailyFantasyFuelPlayers
+    dailyFantasyFuelPlayers,
+    fantasyDataPlayers,
+    dailyFantasyNerdPlayers
   );
 
   // print stats and save projections
-  await sqlServerService.savePlayerProjections(playerProjections, 3, 2, () => {
+  await sqlServerService.savePlayerProjections(playerProjections, 0, 0, () => {
     const elapsedMilliseconds: number = timer.end();
     const elapsedTime: string = timer.getTimeStringFromMilliseconds(
       elapsedMilliseconds

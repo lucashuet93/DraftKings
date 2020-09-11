@@ -7,3 +7,5 @@ export * from './DraftKingsLineup';
 export * from './MaxSalariesAtPosition';
 export * from './LineupProcessResult';
 export * from './LineupStatistics';
+export * from './DailyFantasyNerdPlayer';
+export * from './FantasyDataPlayer';

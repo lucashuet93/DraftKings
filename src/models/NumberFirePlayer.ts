@@ -4,7 +4,7 @@ export interface NumberFirePlayer {
   projectedPoints: number;
   salary: number;
   projectedValue: number;
-  completionsOverAttempts: string;
+  completionsOverAtt: string;
   passingYds: number;
   passingTds: number;
   passingInts: number;

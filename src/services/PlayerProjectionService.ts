@@ -4,13 +4,17 @@ import {
   RotoGrindersPlayer,
   NumberFirePlayer,
   DraftKingsAvailablePlayer,
+  FantasyDataPlayer,
+  DailyFantasyNerdPlayer,
 } from '../models';
 
 export class PlayerProjectionService {
   projectPointTotal(
     rotoGrindersPlayer: RotoGrindersPlayer | undefined,
     numberFirePlayer: NumberFirePlayer | undefined,
-    dailyFantasyFuelPlayer: DailyFantasyFuelPlayer | undefined
+    dailyFantasyFuelPlayer: DailyFantasyFuelPlayer | undefined,
+    fantasyDataPlayer: FantasyDataPlayer | undefined,
+    dailyFantasyNerdPlayer: DailyFantasyNerdPlayer | undefined
   ): number {
     let count: number = 0;
     let totalProjection: number = 0;
@@ -26,6 +30,14 @@ export class PlayerProjectionService {
       count++;
       totalProjection += dailyFantasyFuelPlayer.projectedPoints;
     }
+    if (fantasyDataPlayer !== undefined) {
+      count++;
+      totalProjection += fantasyDataPlayer.projectedPoints;
+    }
+    if (dailyFantasyNerdPlayer !== undefined) {
+      count++;
+      totalProjection += dailyFantasyNerdPlayer.projectedPoints;
+    }
     return count !== 0 ? totalProjection / count : 0;
   }
 
@@ -33,7 +45,9 @@ export class PlayerProjectionService {
     draftKingsAvailablePlayers: DraftKingsAvailablePlayer[],
     rotoGrindersPlayers: RotoGrindersPlayer[],
     numberFirePlayers: NumberFirePlayer[],
-    dailyFantasyFuelPlayers: DailyFantasyFuelPlayer[]
+    dailyFantasyFuelPlayers: DailyFantasyFuelPlayer[],
+    fantasyDataPlayers: FantasyDataPlayer[],
+    dailyFantasyNerdPlayers: DailyFantasyNerdPlayer[]
   ): ProjectedPlayer[] {
     const projectedPlayers: ProjectedPlayer[] = draftKingsAvailablePlayers.map(
       (draftKingsAvailablePlayer: DraftKingsAvailablePlayer) => {
@@ -65,10 +79,30 @@ export class PlayerProjectionService {
             );
           }
         );
+        const linkedFantasyDataPlayer:
+          | FantasyDataPlayer
+          | undefined = fantasyDataPlayers.find((player: FantasyDataPlayer) => {
+          return (
+            player.fullName === draftKingsAvailablePlayer.fullName &&
+            player.position === draftKingsAvailablePlayer.position
+          );
+        });
+        const linkedDailyFantasyNerdPlayer:
+          | DailyFantasyNerdPlayer
+          | undefined = dailyFantasyNerdPlayers.find(
+          (player: DailyFantasyNerdPlayer) => {
+            return (
+              player.fullName === draftKingsAvailablePlayer.fullName &&
+              player.position === draftKingsAvailablePlayer.position
+            );
+          }
+        );
         const averageProjectedPoints: number = this.projectPointTotal(
           linkedRotoGrindersPlayer,
           linkedNumberFirePlayer,
-          linkedDailyFantasyFuelPlayer
+          linkedDailyFantasyFuelPlayer,
+          linkedFantasyDataPlayer,
+          linkedDailyFantasyNerdPlayer
         );
         const lastName:
           | string
@@ -98,7 +132,15 @@ export class PlayerProjectionService {
             linkedDailyFantasyFuelPlayer !== undefined
               ? linkedDailyFantasyFuelPlayer.projectedPoints
               : 0,
-          projectedPoints: averageProjectedPoints,
+          fantasyDataProjection:
+            linkedFantasyDataPlayer !== undefined
+              ? linkedFantasyDataPlayer.projectedPoints
+              : 0,
+          dailyFantasyNerdProjection:
+            linkedDailyFantasyNerdPlayer !== undefined
+              ? linkedDailyFantasyNerdPlayer.projectedPoints
+              : 0,
+          projectedPoints: +averageProjectedPoints.toFixed(2),
           // use unary operator to accurately round to 2 decimal places
           projectedValue: +(
             (averageProjectedPoints / draftKingsAvailablePlayer.salary) *

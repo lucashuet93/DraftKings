@@ -9,6 +9,8 @@ export interface ProjectedPlayer {
   rotoGrindersProjection: number;
   numberFireProjection: number;
   dailyFantasyFuelProjection: number;
+  fantasyDataProjection: number;
+  dailyFantasyNerdProjection: number;
   projectedPoints: number;
   projectedValue: number;
   averagePPG: number;
