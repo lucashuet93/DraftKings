@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "test": "mocha -r ts-node/register src/**/*.test.ts",
     "build": "tsc",
     "project": "node ./build/scripts/projectPlayers.js",
     "optimize": "node ./build/scripts/optimizeLineups.js"
@@ -12,9 +13,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/chai": "^4.2.12",
+    "@types/mocha": "^8.0.3",
     "@types/tedious": "^4.0.1",
+    "chai": "^4.2.0",
     "csv-writer": "^1.6.0",
     "dotenv": "^8.2.0",
-    "tedious": "^9.2.1"
+    "mocha": "^8.1.3",
+    "tedious": "^9.2.1",
+    "ts-node": "^9.0.0",
+    "typescript": "^4.0.2"
   }
 }
