@@ -72,86 +72,41 @@ export class LineupAnalyzer {
     let wideReceiverIds: Map<string, number> = new Map<string, number>();
     let tightEndIds: Map<string, number> = new Map<string, number>();
     let defenseIds: Map<string, number> = new Map<string, number>();
-    topLineups.forEach((lineup: DraftKingsLineup) => {
-      const flexPosition: string = playerProjections.find(
-        (player: ProjectedPlayer) => {
-          return player.playerId === lineup.FLEX;
+    playerProjections.forEach((player: ProjectedPlayer) => {
+      const appearances: DraftKingsLineup[] = topLineups.filter(
+        (lineup: DraftKingsLineup) => {
+          const allIds: string[] = [
+            lineup.QB,
+            lineup.RB1,
+            lineup.RB2,
+            lineup.WR1,
+            lineup.WR2,
+            lineup.WR3,
+            lineup.TE,
+            lineup.FLEX,
+            lineup.DST,
+          ];
+          return allIds.includes(player.playerId);
         }
-      )!.position;
-      if (quarterbackIds.has(lineup.QB)) {
-        const currentCount: number = quarterbackIds.get(lineup.QB)!;
-        quarterbackIds.set(lineup.QB, currentCount + 1);
-      } else {
-        quarterbackIds.set(lineup.QB, 1);
-      }
-      if (runningbackIds.has(lineup.RB1)) {
-        const currentCount: number = runningbackIds.get(lineup.RB1)!;
-        runningbackIds.set(lineup.RB1, currentCount + 1);
-      } else {
-        runningbackIds.set(lineup.RB1, 1);
-      }
-      if (runningbackIds.has(lineup.RB2)) {
-        const currentCount: number = runningbackIds.get(lineup.RB2)!;
-        runningbackIds.set(lineup.RB2, currentCount + 1);
-      } else {
-        runningbackIds.set(lineup.RB2, 1);
-      }
-      if (runningbackIds.has(lineup.FLEX)) {
-        const currentCount: number = runningbackIds.get(lineup.FLEX)!;
-        runningbackIds.set(lineup.FLEX, currentCount + 1);
-      } else {
-        // if flex is a running back, add it
-        if (flexPosition === 'RB') {
-          runningbackIds.set(lineup.FLEX, 1);
-        }
-      }
-      if (wideReceiverIds.has(lineup.WR1)) {
-        const currentCount: number = wideReceiverIds.get(lineup.WR1)!;
-        wideReceiverIds.set(lineup.WR1, currentCount + 1);
-      } else {
-        wideReceiverIds.set(lineup.WR1, 1);
-      }
-      if (wideReceiverIds.has(lineup.WR2)) {
-        const currentCount: number = wideReceiverIds.get(lineup.WR2)!;
-        wideReceiverIds.set(lineup.WR2, currentCount + 1);
-      } else {
-        wideReceiverIds.set(lineup.WR2, 1);
-      }
-      if (wideReceiverIds.has(lineup.WR3)) {
-        const currentCount: number = wideReceiverIds.get(lineup.WR3)!;
-        wideReceiverIds.set(lineup.WR3, currentCount + 1);
-      } else {
-        wideReceiverIds.set(lineup.WR3, 1);
-      }
-      if (wideReceiverIds.has(lineup.FLEX)) {
-        const currentCount: number = wideReceiverIds.get(lineup.FLEX)!;
-        wideReceiverIds.set(lineup.FLEX, currentCount + 1);
-      } else {
-        // if flex is a wide receiver, add it
-        if (flexPosition === 'WR') {
-          wideReceiverIds.set(lineup.FLEX, 1);
-        }
-      }
-      if (tightEndIds.has(lineup.TE)) {
-        const currentCount: number = tightEndIds.get(lineup.TE)!;
-        tightEndIds.set(lineup.TE, currentCount + 1);
-      } else {
-        tightEndIds.set(lineup.TE, 1);
-      }
-      if (tightEndIds.has(lineup.FLEX)) {
-        const currentCount: number = tightEndIds.get(lineup.FLEX)!;
-        tightEndIds.set(lineup.FLEX, currentCount + 1);
-      } else {
-        // if flex is a tight end, add it
-        if (flexPosition === 'TE') {
-          tightEndIds.set(lineup.FLEX, 1);
-        }
-      }
-      if (defenseIds.has(lineup.DST)) {
-        const currentCount: number = defenseIds.get(lineup.DST)!;
-        defenseIds.set(lineup.DST, currentCount + 1);
-      } else {
-        defenseIds.set(lineup.DST, 1);
+      );
+      switch (player.position) {
+        case 'QB':
+          quarterbackIds.set(player.playerId, appearances.length);
+          break;
+        case 'RB':
+          runningbackIds.set(player.playerId, appearances.length);
+          break;
+        case 'WR':
+          wideReceiverIds.set(player.playerId, appearances.length);
+          break;
+        case 'TE':
+          tightEndIds.set(player.playerId, appearances.length);
+          break;
+        case 'DST':
+          defenseIds.set(player.playerId, appearances.length);
+          break;
+        default:
+          break;
       }
     });
     const lineupStatistics: LineupStatistics = {
