@@ -42,8 +42,8 @@ const optimizeLineups = async () => {
   );
 
   // print stats and save lineups
-  lineupAnalyzer.printLineupStatistics(projectedPlayers, optimizedLineups);
   await csvFileWriter.writeLineupsToFile(optimizedLineups);
+  lineupAnalyzer.printLineupStatistics(projectedPlayers, optimizedLineups);
   await sqlServerService.saveTopLineups(optimizedLineups, () => {
     const elapsedMilliseconds: number = timer.end();
     const elapsedTime: string = timer.getTimeStringFromMilliseconds(

@@ -21,9 +21,11 @@ export class SQLServerService {
 
   buildLoadRequestForTable(
     tableName: string,
+    connection: Connection,
     onError: (err: Error) => void
   ): Request {
     return new Request(`SELECT * FROM [dbo].[${tableName}];`, (err: Error) => {
+      connection.close();
       if (err) {
         onError(err);
       }
@@ -39,6 +41,7 @@ export class SQLServerService {
         } else {
           const request: Request = this.buildLoadRequestForTable(
             tableName,
+            connection,
             (err: Error) => {
               reject(err);
             }
@@ -99,6 +102,7 @@ export class SQLServerService {
           const request: Request = new Request(
             `DELETE FROM [dbo].[PlayerProjections]; INSERT INTO [dbo].[PlayerProjections] (FirstName, LastName, PlayerId, Position, Salary, Team, Opponent, RotoGrindersProjection, NumberFireProjection, DailyFantasyFuelProjection, FantasyDataProjection, DailyFantasyNerdProjection, ProjectedPoints, ProjectedValue, AveragePPG) VALUES ${valueString};`,
             (err: Error) => {
+              connection.close();
               if (err) {
                 reject(err);
               }
@@ -132,6 +136,7 @@ export class SQLServerService {
           const request: Request = new Request(
             `DELETE FROM [dbo].[DraftKingsLineups]; INSERT INTO [dbo].[DraftKingsLineups] (QB, RB1, RB2, WR1, WR2, WR3, TE, FLEX, DST, ProjectedPoints, TotalSalary) VALUES ${valueString};`,
             (err: Error) => {
+              connection.close();
               if (err) {
                 reject(err);
               }
