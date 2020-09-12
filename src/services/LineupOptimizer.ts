@@ -5,6 +5,7 @@ import {
   LineupProcessResult,
 } from '../models';
 import { SalaryAnalyzer } from './SalaryAnalyzer';
+import { Presets, SingleBar } from 'cli-progress';
 
 export class LineupOptimizer {
   constructor(public salaryAnalyzer: SalaryAnalyzer) {}
@@ -140,10 +141,11 @@ export class LineupOptimizer {
       flexOptions,
       defenses
     );
+    const totalRunningbackLoops: number =
+      quarterbacks.length * runningbacks.length;
+    const progressBar = new SingleBar({}, Presets.shades_classic);
+    progressBar.start(totalRunningbackLoops, 0);
     quarterbacks.forEach((quarterback: ProjectedPlayer, index: number) => {
-      console.log(
-        `Processing QB${index} ${quarterback.firstName} ${quarterback.lastName}`
-      );
       let lineupSalaryTotal: number = this.calculateSalaryTotal([quarterback]);
       if (lineupSalaryTotal <= maxSalariesAtPosition.QB) {
         runningbacks.forEach(
@@ -408,12 +410,15 @@ export class LineupOptimizer {
             } else {
               lineupSalaryTotal = this.calculateSalaryTotal([quarterback]);
             }
+            progressBar.increment();
           }
         );
       } else {
         lineupSalaryTotal = 0;
       }
+      progressBar.updateETA();
     });
+    progressBar.stop();
     return topLineups;
   }
 }
