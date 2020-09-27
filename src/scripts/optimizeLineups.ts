@@ -38,7 +38,7 @@ const optimizeLineups = async () => {
   // optimize lineups
   const optimizedLineups: DraftKingsLineup[] = lineupOptimizer.optimizeLineups(
     projectedPlayers,
-    150
+    parseInt(process.argv[2])
   );
 
   // print stats and save lineups
